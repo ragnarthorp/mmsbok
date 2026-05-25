@@ -1,0 +1,3812 @@
+/* ----------------------------------------------------------------------
+   Gervigreind — vefbók
+   Stíll fyrir aðgengi: stór texti, mikil lína, hár birtuskil.
+   ---------------------------------------------------------------------- */
+
+/* Atkinson Hyperlegible — sérhannað fyrir lesblindu og lélega sjón */
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+:root {
+  --bg: #FAFAF7;
+  --bg-sidebar: #F2F1EC;
+  --bg-card: #FFFFFF;
+  --bg-elev: #F5F3EC;
+  --text: #1A1A1A;
+  --text-muted: #555049;
+  --border: #DAD7CE;
+  --border-soft: #E8E5DC;
+  --hover: #E8E5DC;
+  --accent: #2A5C66;          /* muted teal — eini áherslulitur */
+  --accent-soft: #E3EEF0;
+  --accent-hover: #1F454D;
+
+  --weave-off: #DDD4BD;       /* hlýtt beige fyrir ólyft þræði */
+
+  --font-body: "Atkinson Hyperlegible", Georgia, "Iowan Old Style",
+               "Apple Garamond", "Palatino Linotype", serif;
+
+  --content-max: 680px;
+  --sidebar-w: 300px;
+  --header-h: 72px;
+
+  --radius: 6px;
+}
+
+html { font-size: 20px; }    /* breytt af lestoolbarinu: 18 / 20 / 22 */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.8;
+  font-weight: 400;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Næturhamur — dökkur lestur */
+body.is-dark {
+  --bg: #14171B;
+  --bg-sidebar: #1B1F24;
+  --bg-card: #1F242A;
+  --bg-elev: #1B1F24;
+  --text: #E8E5DC;
+  --text-muted: #9AA0A6;
+  --border: #2D343C;
+  --border-soft: #232930;
+  --hover: #262C33;
+  --accent: #5FB3BC;
+  --accent-soft: rgba(95, 179, 188, 0.12);
+  --accent-hover: #7DC9D2;
+  --weave-off: #4A535C;
+}
+
+/* Hjálparhönd fyrir skjálesara */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Sleppa-í-aðalefni hnappur */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: -100px;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  z-index: 1000;
+  border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { top: 0; }
+
+/* ----------------------------------------------------------------------
+   Haus
+   ---------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--header-h);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.25rem;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.brand-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.brand-author {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.menu-toggle {
+  display: none;             /* aðeins á símum */
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 44px; height: 44px;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text);
+  align-items: center;
+  justify-content: center;
+}
+.menu-toggle:hover { background: var(--bg-sidebar); }
+.menu-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.menu-toggle svg { display: block; }
+
+/* ----------------------------------------------------------------------
+   Heildarútlit
+   ---------------------------------------------------------------------- */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: calc(100vh - var(--header-h));
+}
+
+/* ----------------------------------------------------------------------
+   Hliðarstika með köflum
+   ---------------------------------------------------------------------- */
+.sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.25rem 3rem;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+}
+
+.sidebar-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+.toc {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-part {
+  margin-bottom: 1.75rem;
+}
+
+.toc-part-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.toc-part-num {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.toc-chapters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.toc-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  margin: 0.15rem 0;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  border-left: 3px solid transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.toc-link-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 2.1em;
+}
+.toc-link.is-current .toc-link-num {
+  color: var(--accent);
+}
+
+.toc-link:hover {
+  background: var(--hover);
+}
+
+.toc-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.toc-link.is-current {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+.toc-empty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.4rem 0.75rem;
+}
+
+/* ----------------------------------------------------------------------
+   Lesefni
+   ---------------------------------------------------------------------- */
+.content {
+  padding: 2rem 2rem 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reading-toolbar {
+  width: 100%;
+  max-width: var(--content-max);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.rt-group {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.rt-btn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1;
+  padding: 0.45rem 0.7rem;
+  min-height: 36px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.rt-btn:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--bg-sidebar);
+}
+
+.rt-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.rt-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rt-btn[aria-pressed="true"] {
+  color: var(--accent-hover);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.rt-btn .rt-a-sm  { font-size: 0.82rem; font-weight: 700; }
+.rt-btn .rt-a-lg  { font-size: 1.15rem; font-weight: 700; }
+
+.rt-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+}
+
+.chapter {
+  width: 100%;
+  max-width: var(--content-max);
+}
+
+.chapter-eyebrow {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.chapter-title {
+  font-size: 2.15rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 2rem;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+.chapter-title-num {
+  color: var(--accent);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+.chapter-body p {
+  margin: 0 0 1.4em;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  hyphens: auto;
+  text-wrap: pretty;
+}
+
+.chapter-body p:first-of-type::first-line {
+  /* mild áhrif — fyrsta lína er aðeins þyngri */
+  font-weight: 400;
+}
+
+/* Skýringarmynd — staðgengill */
+.visual-placeholder {
+  margin: 2.5rem 0;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.visual-placeholder-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem;
+}
+
+.visual-placeholder-desc {
+  margin: 0;
+  font-size: 0.98rem;
+}
+
+/* Hugtök — orðskýringar í lok kafla */
+.concepts {
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.concepts-heading {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem;
+  color: var(--text);
+}
+
+.concept-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.concept {
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  background: var(--bg-card);
+}
+
+.concept-term {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: var(--accent-hover);
+}
+
+.concept-explanation {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* Hliðarskuggi — falinn á tölvuskjám, birtist aðeins á símum */
+.sidebar-scrim { display: none; }
+
+/* Tómur ríkisstaður — t.d. ef kafli finnst ekki */
+.empty-state {
+  max-width: var(--content-max);
+  color: var(--text-muted);
+}
+.empty-state h2 {
+  color: var(--text);
+  margin-top: 0;
+}
+
+/* Næsti / fyrri kafli */
+.chapter-nav {
+  margin-top: 3.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.chapter-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.1s ease;
+}
+.chapter-nav-link:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+.chapter-nav-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.chapter-nav-prev { text-align: left;  }
+.chapter-nav-next { text-align: right; }
+.chapter-nav-dir {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.chapter-nav-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text);
+  text-wrap: balance;
+}
+
+@media (max-width: 520px) {
+  .chapter-nav { grid-template-columns: 1fr; gap: 0.6rem; }
+  .chapter-nav-prev, .chapter-nav-next { text-align: left; }
+  .chapter-nav-next { text-align: left; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Jacquard-vefstóll (gagnvirk)
+   ---------------------------------------------------------------------- */
+.loom-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.loom-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.loom-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.loom-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 0;
+}
+
+.loom-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.loom-card {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  transition: opacity 0.25s ease, border-color 0.25s ease,
+              box-shadow 0.25s ease, transform 0.25s ease;
+}
+.loom-card.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  transform: translateX(4px);
+}
+.loom-card.is-done {
+  opacity: 0.35;
+}
+
+.loom-cell {
+  appearance: none;
+  padding: 0;
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  display: inline-block;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.loom-cell:hover {
+  border-color: var(--accent);
+  transform: scale(1.15);
+}
+.loom-cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.loom-cell.is-hole {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.loom-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
+  text-wrap: pretty;
+  max-width: 36ch;
+  line-height: 1.5;
+}
+
+.loom-arrow {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  line-height: 1;
+  margin: -0.25rem 0;
+}
+
+.loom-fabric {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.loom-fabric-row {
+  display: flex;
+}
+.loom-weave {
+  width: 28px;
+  height: 22px;
+  background: var(--weave-off);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.loom-fabric-row:last-child .loom-weave { border-bottom: 0; }
+.loom-fabric-row .loom-weave:last-child { border-right: 0; }
+.loom-weave.is-lifted {
+  background: var(--accent);
+}
+.loom-fabric-row.is-shown .loom-weave {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.loom-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.loom-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.loom-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.loom-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.loom-btn:disabled { opacity: 0.5; cursor: default; }
+.loom-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.loom-btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+body.is-dark .loom-btn-primary,
+body.is-dark .loom-btn-primary:hover:not(:disabled) {
+  color: #14171B;
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Enigma-þraut (gagnvirk)
+   ---------------------------------------------------------------------- */
+.enigma-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+}
+
+.enigma-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0 0 0.5rem;
+}
+.enigma-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto 1.5rem;
+  max-width: 44ch;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.enigma-rotors {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin: 0 auto 1.75rem;
+}
+
+.enigma-rotor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 70px;
+}
+
+.enigma-rotor-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.enigma-rotor-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 68px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
+}
+
+.enigma-rotor.is-active .enigma-rotor-letter {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.enigma-rotor.is-locked .enigma-rotor-letter {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+/* Sýnileiki á hnöppum vs lásmerki eftir ástandi */
+.enigma-rotor.is-locked .enigma-rotor-btn    { visibility: hidden; }
+.enigma-rotor.is-active .enigma-rotor-status { visibility: hidden; }
+
+.enigma-rotor-status {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.enigma-rotor-btn {
+  appearance: none;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  width: 38px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.enigma-rotor-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.enigma-rotor-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.enigma-displays {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.enigma-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0.55rem 0;
+}
+.enigma-row-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 700;
+  flex-shrink: 0;
+  width: 5rem;
+  text-align: right;
+}
+.enigma-cells {
+  display: flex;
+  gap: 0.3rem;
+}
+.enigma-cell {
+  width: 30px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+.enigma-cell.is-cipher {
+  color: var(--text-muted);
+  background: transparent;
+  border-style: dashed;
+}
+.enigma-cell.is-plain {
+  color: var(--text);
+}
+.enigma-figure.is-solved .enigma-cell.is-plain {
+  color: #1F5C44;
+  border-color: #2E7D5F;
+  background: rgba(46, 125, 95, 0.10);
+}
+body.is-dark .enigma-figure.is-solved .enigma-cell.is-plain {
+  color: #A8E5C0;
+  border-color: #6FBF93;
+  background: rgba(111, 191, 147, 0.12);
+}
+
+.enigma-success {
+  margin: 1.5rem auto 0;
+  padding: 1rem 1.25rem;
+  background: rgba(46, 125, 95, 0.10);
+  border-left: 4px solid #2E7D5F;
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 540px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+.enigma-figure.is-solved .enigma-success {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.enigma-success strong {
+  color: #1F5C44;
+}
+body.is-dark .enigma-success {
+  background: rgba(111, 191, 147, 0.08);
+  border-left-color: #6FBF93;
+}
+body.is-dark .enigma-success strong {
+  color: #A8E5C0;
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Tvíleit (gagnvirk)
+   ---------------------------------------------------------------------- */
+.binsearch-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.binsearch-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+
+.binsearch-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 44ch;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.binsearch-meter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.5rem;
+}
+.binsearch-counter {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.binsearch-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.binsearch-cell {
+  appearance: none;
+  width: 100%;
+  height: 36px;
+  padding: 0;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease,
+              border-color 0.15s ease, opacity 0.25s ease;
+}
+.binsearch-cell:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.binsearch-cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  position: relative;
+  z-index: 1;
+}
+.binsearch-cell:disabled { cursor: default; }
+
+.binsearch-cell.is-out {
+  background: rgba(176, 60, 60, 0.10);
+  border-color: rgba(176, 60, 60, 0.40);
+  color: rgba(176, 60, 60, 0.65);
+  opacity: 0.55;
+}
+body.is-dark .binsearch-cell.is-out {
+  background: rgba(229, 115, 115, 0.10);
+  border-color: rgba(229, 115, 115, 0.35);
+  color: rgba(229, 115, 115, 0.70);
+}
+
+.binsearch-cell.is-correct {
+  background: rgba(46, 125, 95, 0.22);
+  border-color: #2E7D5F;
+  color: #1F5C44;
+  opacity: 1;
+  font-weight: 700;
+}
+body.is-dark .binsearch-cell.is-correct {
+  background: rgba(111, 191, 147, 0.18);
+  border-color: #6FBF93;
+  color: #A8E5C0;
+}
+
+.binsearch-result {
+  margin-top: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(46, 125, 95, 0.10);
+  border-left: 4px solid #2E7D5F;
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 540px;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+.binsearch-result.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+body.is-dark .binsearch-result {
+  background: rgba(111, 191, 147, 0.08);
+  border-left-color: #6FBF93;
+}
+
+.binsearch-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.binsearch-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.binsearch-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.binsearch-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .binsearch-cell { height: 30px; font-size: 0.82rem; }
+  .binsearch-grid { gap: 3px; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Samanburður á reikniafli (pixla-teikning)
+   ---------------------------------------------------------------------- */
+.pxcompare-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.pxcompare-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.pxcompare-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 44ch;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.pxcompare-panels {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.pxcompare-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 0 0 auto;
+}
+
+.pxcompare-select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.4rem 1.75rem 0.4rem 0.7rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background-color: var(--bg-card);
+  background-image:
+    linear-gradient(45deg,  transparent 50%, var(--text-muted) 50%),
+    linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 0.85rem) 50%, calc(100% - 0.55rem) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  color: var(--text);
+  cursor: pointer;
+  width: 200px;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.pxcompare-select:hover {
+  border-color: var(--accent);
+}
+.pxcompare-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.pxgrid {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 1px;
+  width: 192px;
+  height: 192px;
+  background: var(--border);
+  padding: 1px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.pxgrid-cell {
+  background: var(--bg-card);
+  min-width: 0;
+  min-height: 0;
+  transition: background 0.08s linear;
+}
+.pxgrid-cell.is-drawn {
+  background: var(--bg-elev);
+}
+body.is-dark .pxgrid-cell.is-drawn {
+  background: #262C33;
+}
+.pxgrid-cell.is-fg {
+  background: var(--accent);
+}
+
+.pxgrid-clock {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg-card);
+  padding: 0.35rem 0.7rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+  min-width: 7.5ch;
+  text-align: center;
+}
+
+.pxcompare-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.pxcompare-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.92rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.pxcompare-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.pxcompare-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.pxcompare-btn:disabled { opacity: 0.6; cursor: default; }
+
+.pxcompare-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.pxcompare-btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+body.is-dark .pxcompare-btn-primary,
+body.is-dark .pxcompare-btn-primary:hover:not(:disabled) {
+  color: #14171B;
+}
+
+.pxcompare-result {
+  font-size: 0.95rem;
+  color: var(--text);
+  text-align: center;
+  text-wrap: pretty;
+  max-width: 540px;
+  margin: 0.5rem auto 0;
+  min-height: 1.6em;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  line-height: 1.5;
+}
+.pxcompare-result.is-visible { opacity: 1; }
+
+@media (max-width: 480px) {
+  .pxcompare-panels { gap: 1rem; }
+  .pxgrid { width: 160px; height: 160px; }
+  .pxcompare-select { width: 160px; font-size: 0.82rem; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Kínverska herbergið (gagnvirkur leikur)
+   ---------------------------------------------------------------------- */
+.chinroom-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.chinroom-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.chinroom-intro {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 52ch;
+  margin: 0 auto;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.chinroom-section-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+.chinroom-rules {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.5rem 1.25rem;
+  padding: 1rem 1.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.chinroom-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.chinroom-rule-arrow {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+.chinroom-rule-in,
+.chinroom-rule-out {
+  font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+.chinroom-rule-out { color: var(--accent-hover); }
+
+.chinroom-prompt {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.4rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg-card);
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  line-height: 1;
+}
+
+.chinroom-answer-label {
+  font-size: 0.92rem;
+  color: var(--text);
+  text-align: center;
+  margin: 0;
+}
+
+.chinroom-answers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 380px;
+}
+.chinroom-answer {
+  appearance: none;
+  font-family: inherit;
+  font-size: 1.8rem;
+  font-weight: 700;
+  padding: 0.7rem 0.5rem;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease,
+              border-color 0.12s ease, transform 0.1s ease;
+  line-height: 1;
+}
+.chinroom-answer:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.chinroom-answer:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.chinroom-answer:disabled { cursor: default; opacity: 0.55; }
+.chinroom-answer.is-correct {
+  background: rgba(46, 125, 95, 0.22);
+  border-color: #2E7D5F;
+  color: #1F5C44;
+  opacity: 1;
+}
+.chinroom-answer.is-wrong {
+  background: rgba(176, 60, 60, 0.22);
+  border-color: #B03C3C;
+  color: #8B2C2C;
+  opacity: 1;
+}
+body.is-dark .chinroom-answer.is-correct {
+  background: rgba(111, 191, 147, 0.18);
+  border-color: #6FBF93;
+  color: #A8E5C0;
+}
+body.is-dark .chinroom-answer.is-wrong {
+  background: rgba(229, 115, 115, 0.18);
+  border-color: #E57373;
+  color: #FFB0B0;
+}
+
+.chinroom-feedback {
+  min-height: 1em;
+  text-align: center;
+  width: 100%;
+  max-width: 380px;
+}
+.chinroom-feedback.is-correct,
+.chinroom-feedback.is-wrong {
+  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid;
+  font-weight: 700;
+}
+.chinroom-feedback.is-correct {
+  background: rgba(46, 125, 95, 0.12);
+  border-color: #2E7D5F;
+}
+.chinroom-feedback.is-wrong {
+  background: rgba(176, 60, 60, 0.12);
+  border-color: #B03C3C;
+}
+body.is-dark .chinroom-feedback.is-correct {
+  background: rgba(111, 191, 147, 0.10);
+  border-color: #6FBF93;
+}
+body.is-dark .chinroom-feedback.is-wrong {
+  background: rgba(229, 115, 115, 0.10);
+  border-color: #E57373;
+}
+.chinroom-cn {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.chinroom-feedback.is-correct .chinroom-cn { color: #1F5C44; }
+.chinroom-feedback.is-wrong   .chinroom-cn { color: #8B2C2C; }
+body.is-dark .chinroom-feedback.is-correct .chinroom-cn { color: #A8E5C0; }
+body.is-dark .chinroom-feedback.is-wrong   .chinroom-cn { color: #FFB0B0; }
+
+.chinroom-next {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  display: none;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.chinroom-next:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.chinroom-next:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+body.is-dark .chinroom-next { color: #14171B; }
+
+.chinroom-caption {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  text-wrap: pretty;
+  max-width: 56ch;
+  margin: 0 auto;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .chinroom-rules { grid-template-columns: 1fr; }
+  .chinroom-rule { font-size: 1.4rem; }
+  .chinroom-prompt { width: 80px; height: 80px; font-size: 2.8rem; }
+  .chinroom-answer { font-size: 1.5rem; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Samanburðartafla tugakerfi/tvíundarkerfi
+   ---------------------------------------------------------------------- */
+.bintable-figure {
+  margin: 2.5rem 0;
+  padding: 1.5rem 1.25rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.bintable-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.bintable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  max-width: 360px;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.bintable th {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+}
+body.is-dark .bintable th { color: #14171B; }
+.bintable td {
+  padding: 0.55rem 1rem;
+  font-size: 1rem;
+  border-top: 1px solid var(--border);
+}
+.bintable tbody tr:nth-child(odd) td {
+  background: var(--bg-card);
+}
+.bintable-binary {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--accent-hover);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Tvíundabreytir (slider + bitabox)
+   ---------------------------------------------------------------------- */
+.binconv-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+}
+.binconv-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.binconv-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 420px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.binconv-slider {
+  flex: 1 1 200px;
+  min-width: 180px;
+  accent-color: var(--accent);
+}
+.binconv-slider:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.binconv-number {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.5rem 0.6rem;
+  width: 5.5rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-card);
+  color: var(--text);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.binconv-number::-webkit-outer-spin-button,
+.binconv-number::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.binconv-number:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+.binconv-bits {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 420px;
+}
+.binconv-bit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+.binconv-bit-cell {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s ease, color 0.12s ease,
+              border-color 0.12s ease, transform 0.1s ease;
+}
+.binconv-bit-cell:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.binconv-bit-cell.is-on:hover {
+  color: #fff;
+}
+body.is-dark .binconv-bit-cell.is-on:hover { color: #14171B; }
+.binconv-bit-cell:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.binconv-bit-cell.is-on {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+body.is-dark .binconv-bit-cell.is-on { color: #14171B; }
+.binconv-bit-value {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.binconv-string {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent-hover);
+  margin: 0;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.binconv-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 44ch;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .binconv-bits { gap: 0.25rem; }
+  .binconv-bit-cell { font-size: 0.95rem; }
+  .binconv-bit-value { font-size: 0.62rem; }
+  .binconv-string { font-size: 1.15rem; letter-spacing: 0.07em; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Staftáknun (gagnvirkur kóðari)
+   ---------------------------------------------------------------------- */
+.charenc-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.charenc-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.charenc-quick {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.charenc-quick-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 0.4rem 0;
+  width: 2.4rem;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease, transform 0.1s ease;
+}
+.charenc-quick-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.charenc-quick-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.charenc-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.charenc-input-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.charenc-input {
+  appearance: none;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.45rem 0.6rem;
+  width: 4rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-card);
+  color: var(--text);
+  text-align: center;
+}
+.charenc-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.charenc-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.5rem 0;
+}
+.charenc-bigchar {
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--accent-hover);
+  padding: 0.7rem 1.3rem;
+  min-width: 88px;
+  text-align: center;
+  border-radius: 10px;
+  border: 2px solid var(--accent);
+  background: var(--bg-card);
+  font-variant-emoji: emoji;
+}
+.charenc-info {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+.charenc-info-item {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--bg-card);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.charenc-info-item.is-hidden { display: none; }
+.charenc-bytecount {
+  color: var(--accent-hover);
+  border-color: var(--accent);
+}
+
+.charenc-bytes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 420px;
+  align-items: center;
+}
+.charenc-byte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
+}
+.charenc-byte-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.charenc-byte-bits {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.3rem;
+  width: 100%;
+}
+.charenc-bit {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 4px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.charenc-bit.is-on {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+body.is-dark .charenc-bit.is-on { color: #14171B; }
+
+.charenc-string {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent-hover);
+  margin: 0;
+  text-align: center;
+  word-break: break-all;
+  max-width: 100%;
+  line-height: 1.5;
+}
+.charenc-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 48ch;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .charenc-bigchar { font-size: 3rem; padding: 0.6rem 1rem; min-width: 76px; }
+  .charenc-bit { font-size: 0.82rem; }
+  .charenc-string { font-size: 0.85rem; }
+  .charenc-quick-btn { width: 2.2rem; font-size: 1.05rem; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: RGB-litaröð (rauður/grænn/blár)
+   ---------------------------------------------------------------------- */
+.rgbmix-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.rgbmix-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.rgbmix-heart {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 1px;
+  width: 100%;
+  max-width: 288px;
+  aspect-ratio: 1 / 1;
+  padding: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.rgbmix-heart-cell {
+  background: var(--bg-card);
+}
+.rgbmix-heart-cell.is-fg {
+  background: rgb(100, 100, 100);
+}
+.rgbmix-rgb {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.rgbmix-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  max-width: 460px;
+}
+.rgbmix-quick-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem 0.35rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.rgbmix-quick-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.rgbmix-quick-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.rgbmix-quick-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.rgbmix-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 440px;
+}
+.rgbmix-channel { width: 100%; }
+.rgbmix-ch-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.35rem;
+}
+.rgbmix-ch-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.rgbmix-ch-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  font-variant-numeric: tabular-nums;
+}
+.rgbmix-slider {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.rgbmix-slider:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.rgbmix-bits {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+}
+.rgbmix-bit {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 4px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.rgbmix-bit.is-on {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+body.is-dark .rgbmix-bit.is-on { color: #14171B; }
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Tíðnis-skoðari (sínbylgja + Web Audio)
+   ---------------------------------------------------------------------- */
+.audiofreq-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+.audiofreq-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.audiofreq-hz {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  margin: 0.25rem 0;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.audiofreq-slider-wrap {
+  width: 100%;
+  max-width: 480px;
+}
+.audiofreq-slider {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.audiofreq-slider:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.audiofreq-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  font-variant-numeric: tabular-nums;
+}
+.audiofreq-canvas {
+  width: 100%;
+  max-width: 480px;
+  height: 100px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  display: block;
+}
+.audiofreq-play {
+  appearance: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+.audiofreq-play:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.audiofreq-play:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.audiofreq-play.is-playing {
+  background: var(--accent-hover);
+  transform: scale(0.98);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+body.is-dark .audiofreq-play { color: #14171B; }
+.audiofreq-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 48ch;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .rgbmix-heart { max-width: 240px; }
+  .rgbmix-bit { font-size: 0.75rem; }
+  .audiofreq-hz { font-size: 1.7rem; }
+  .audiofreq-canvas { height: 80px; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Rökhugsunarmyndir (rétt og röng röksemdafærsla)
+   ---------------------------------------------------------------------- */
+.logicdiag-figure {
+  margin: 3rem 0;
+  padding: 1.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+}
+.logicdiag-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+.logicdiag-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.logicdiag-col-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 0.25rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+.logicdiag-box {
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+.logicdiag-label {
+  font-weight: 700;
+  color: var(--accent-hover);
+  letter-spacing: 0.02em;
+}
+.logicdiag-arrow {
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  line-height: 1;
+  margin: -0.1rem 0;
+}
+.logicdiag-conclusion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  border-width: 2px;
+}
+.logicdiag-conclusion-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.logicdiag-conclusion-text {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.logicdiag-conclusion-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.logicdiag-conclusion-ok {
+  background: rgba(46, 125, 95, 0.10);
+  border-color: #2E7D5F;
+}
+.logicdiag-conclusion-ok .logicdiag-conclusion-label,
+.logicdiag-conclusion-ok .logicdiag-conclusion-text {
+  color: #1F5C44;
+}
+body.is-dark .logicdiag-conclusion-ok {
+  background: rgba(111, 191, 147, 0.10);
+  border-color: #6FBF93;
+}
+body.is-dark .logicdiag-conclusion-ok .logicdiag-conclusion-label,
+body.is-dark .logicdiag-conclusion-ok .logicdiag-conclusion-text {
+  color: #A8E5C0;
+}
+
+.logicdiag-conclusion-bad {
+  background: rgba(176, 60, 60, 0.10);
+  border-color: #B03C3C;
+}
+.logicdiag-conclusion-bad .logicdiag-conclusion-label,
+.logicdiag-conclusion-bad .logicdiag-conclusion-text {
+  color: #8B2C2C;
+}
+body.is-dark .logicdiag-conclusion-bad {
+  background: rgba(229, 115, 115, 0.10);
+  border-color: #E57373;
+}
+body.is-dark .logicdiag-conclusion-bad .logicdiag-conclusion-label,
+body.is-dark .logicdiag-conclusion-bad .logicdiag-conclusion-text {
+  color: #FFB0B0;
+}
+
+@media (max-width: 600px) {
+  .logicdiag-pair { grid-template-columns: 1fr; gap: 1.5rem; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Monty Hall hermir (gagnvirkur)
+   ---------------------------------------------------------------------- */
+.monty-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.monty-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.monty-prompt {
+  font-size: 0.95rem;
+  text-align: center;
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--text);
+  text-wrap: pretty;
+}
+.monty-doors {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 380px;
+}
+.monty-door {
+  appearance: none;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 1.1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: inherit;
+  color: var(--text);
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+.monty-door:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.monty-door:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.monty-door:disabled { cursor: default; }
+.monty-door.is-chosen {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.monty-door.is-opened {
+  opacity: 0.7;
+}
+.monty-door.is-final-win {
+  border-color: #2E7D5F;
+  background: rgba(46, 125, 95, 0.18);
+}
+body.is-dark .monty-door.is-final-win {
+  border-color: #6FBF93;
+  background: rgba(111, 191, 147, 0.15);
+}
+.monty-door.is-final-loss {
+  border-color: rgba(176, 60, 60, 0.55);
+}
+body.is-dark .monty-door.is-final-loss {
+  border-color: rgba(229, 115, 115, 0.55);
+}
+.monty-door-num {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.monty-door-content {
+  font-size: 2.4rem;
+  line-height: 1;
+  font-variant-emoji: emoji;
+}
+
+.monty-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+.monty-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.monty-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.monty-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.monty-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.monty-btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+body.is-dark .monty-btn-primary,
+body.is-dark .monty-btn-primary:hover { color: #14171B; }
+
+.monty-replay { display: none; }
+
+.monty-scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 380px;
+  font-size: 0.88rem;
+}
+.monty-scoreboard > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+.monty-stat {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 700;
+  color: var(--accent-hover);
+  font-variant-numeric: tabular-nums;
+}
+.monty-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0.5rem auto 0;
+  max-width: 48ch;
+  line-height: 1.5;
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.monty-note.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ----------------------------------------------------------------------
+   Sameiginlegur rofi (gate-toggle) — notaður í rökhliðum og hálfdeilara
+   ---------------------------------------------------------------------- */
+.gate-toggle {
+  appearance: none;
+  font-family: inherit;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.55rem 1.4rem;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease,
+              border-color 0.15s ease, transform 0.1s ease;
+  min-width: 92px;
+}
+.gate-toggle:hover { border-color: var(--accent); transform: translateY(-1px); }
+.gate-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gate-toggle.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+body.is-dark .gate-toggle.is-on { color: #14171B; }
+.gate-toggle-name {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+}
+.gate-toggle-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Þrjú rökhlið hlið við hlið (AND / OR / XOR)
+   ---------------------------------------------------------------------- */
+.logicgates-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.logicgates-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.logicgates-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 48ch;
+  line-height: 1.5;
+}
+.logicgates-inputs {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+.logicgates-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+}
+.logicgates-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+}
+.logicgates-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+.logicgates-card-symbol {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.logicgates-bulb {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-elev);
+  border: 2px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: background 0.2s ease, color 0.2s ease,
+              border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.logicgates-bulb.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+body.is-dark .logicgates-bulb.is-on { color: #14171B; }
+.logicgates-card-out {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.logicgates-tt {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  margin-top: 0.3rem;
+  font-variant-numeric: tabular-nums;
+}
+.logicgates-tt th, .logicgates-tt td {
+  text-align: center;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.logicgates-tt thead th {
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-elev);
+}
+.logicgates-tt tbody tr.is-active td {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .logicgates-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Hálfdeilari (svona leggur tölvan saman)
+   ---------------------------------------------------------------------- */
+.halfadder-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.halfadder-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.halfadder-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 50ch;
+  line-height: 1.5;
+}
+.halfadder-inputs {
+  display: flex;
+  gap: 1rem;
+}
+.halfadder-circuit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 440px;
+}
+.halfadder-gate {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.halfadder-gate.is-on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.halfadder-gate-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.halfadder-arrow {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+.halfadder-gate.is-on .halfadder-arrow {
+  color: var(--accent-hover);
+}
+.halfadder-output {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+}
+.halfadder-output-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.halfadder-output-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+.halfadder-gate.is-on .halfadder-output-value {
+  color: var(--accent-hover);
+}
+.halfadder-result {
+  font-size: 1.05rem;
+  text-align: center;
+  margin: 0;
+  padding: 0.6rem 1rem;
+  background: var(--bg-card);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
+}
+.halfadder-result strong {
+  color: var(--accent-hover);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (max-width: 480px) {
+  .halfadder-gate { padding: 0.7rem 0.85rem; }
+  .halfadder-gate-label { font-size: 0.85rem; }
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: AND-rafrás (gagnvirk)
+   ---------------------------------------------------------------------- */
+.circuit-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.circuit-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.circuit-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 50ch;
+  line-height: 1.5;
+}
+
+.circuit-svg-wrap {
+  width: 100%;
+  max-width: 560px;
+}
+.circuit-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;
+}
+
+/* Vírar — daufir, ljósir þegar straumur flýgur */
+.circuit-wires path,
+.circuit-wires-a path,
+.circuit-wires-b path {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+  transition: stroke 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+}
+.circuit-wires.is-live path,
+.circuit-wires-a.is-live path,
+.circuit-wires-b.is-live path {
+  stroke: #E8A93A;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(232, 169, 58, 0.55));
+}
+body.is-dark .circuit-wires.is-live path,
+body.is-dark .circuit-wires-a.is-live path,
+body.is-dark .circuit-wires-b.is-live path {
+  stroke: #FFCB57;
+  filter: drop-shadow(0 0 5px rgba(255, 203, 87, 0.7));
+}
+
+/* Rafhlaða */
+.circuit-battery line {
+  stroke: var(--text);
+  stroke-linecap: round;
+}
+.circuit-battery .cell-long  { stroke-width: 3; }
+.circuit-battery .cell-short { stroke-width: 3; }
+.circuit-label {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--text-muted);
+}
+
+/* Rofar */
+.circuit-switch {
+  cursor: pointer;
+}
+.circuit-hit {
+  fill: transparent;
+}
+.circuit-switch:hover .circuit-lever,
+.circuit-switch:hover .circuit-pad {
+  stroke: var(--accent);
+}
+.circuit-switch:focus-visible {
+  outline: none;
+}
+.circuit-switch:focus-visible .circuit-hit {
+  fill: rgba(95, 179, 188, 0.10);
+}
+.circuit-pad {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+.circuit-lever {
+  stroke: var(--text);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: transform 0.22s ease;
+}
+.circuit-switch-label {
+  font-size: 18px;
+  font-weight: 700;
+  fill: var(--text);
+  text-anchor: middle;
+}
+.circuit-switch-state {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  letter-spacing: 0.04em;
+}
+
+.circuit-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  fill: var(--text-muted);
+  text-anchor: middle;
+}
+
+/* Pera */
+.circuit-bulb-glass {
+  fill: var(--bg-card);
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  transition: fill 0.25s ease, stroke 0.25s ease, filter 0.25s ease;
+}
+.circuit-bulb-fil {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  transition: stroke 0.25s ease;
+}
+.circuit-bulb-base {
+  fill: var(--text-muted);
+}
+.circuit-bulb-rays line {
+  stroke: #E8A93A;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.circuit-bulb.is-on .circuit-bulb-glass {
+  fill: #FFE8A0;
+  stroke: #E8A93A;
+  filter: drop-shadow(0 0 12px rgba(232, 169, 58, 0.7));
+}
+.circuit-bulb.is-on .circuit-bulb-fil { stroke: #B07A1A; }
+.circuit-bulb.is-on .circuit-bulb-rays line { opacity: 0.9; }
+body.is-dark .circuit-bulb.is-on .circuit-bulb-glass {
+  fill: #FFD45E;
+  stroke: #FFB347;
+  filter: drop-shadow(0 0 14px rgba(255, 180, 71, 0.8));
+}
+body.is-dark .circuit-bulb-rays line { stroke: #FFCB57; }
+
+/* Stöðuspjald */
+.circuit-status {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.circuit-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.circuit-chip-label {
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.circuit-chip-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.circuit-chip.is-on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.circuit-chip.is-on .circuit-chip-value {
+  color: var(--accent-hover);
+}
+.circuit-bulb-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0;
+}
+.circuit-bulb-label.is-on {
+  color: #B07A1A;
+}
+body.is-dark .circuit-bulb-label.is-on { color: #FFCB57; }
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Gate-smíðari (blueprint-byggingar)
+   ---------------------------------------------------------------------- */
+.gbuilder-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.gbuilder-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.gbuilder-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 50ch;
+  line-height: 1.5;
+}
+.gbuilder-selector {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.gbuilder-pill {
+  appearance: none;
+  font-family: inherit;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, transform 0.1s ease;
+  min-width: 96px;
+}
+.gbuilder-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
+.gbuilder-pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.gbuilder-pill.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+body.is-dark .gbuilder-pill.is-active { color: #14171B; }
+.gbuilder-pill-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.gbuilder-pill-formula {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.gbuilder-pill-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+.gbuilder-pill.is-active .gbuilder-pill-tag {
+  color: rgba(255, 255, 255, 0.85);
+}
+body.is-dark .gbuilder-pill.is-active .gbuilder-pill-tag {
+  color: rgba(20, 23, 27, 0.75);
+}
+
+/* Andstæðu-rofar (NC) — örlítið önnur lit til aðgreiningar */
+.circuit-lever.is-nc {
+  stroke: #D97757;
+}
+body.is-dark .circuit-lever.is-nc {
+  stroke: #FFB18B;
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Hálf-deilari (tveggja-hliða samlagning)
+   ---------------------------------------------------------------------- */
+.hav-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+}
+.hav-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.hav-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 50ch;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+.hav-svg-wrap {
+  width: 100%;
+  max-width: 560px;
+}
+.hav-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  font-family: inherit;
+}
+.hav-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  fill: var(--text-muted);
+  text-anchor: start;
+}
+.hav-input-side-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  fill: var(--text-muted);
+}
+.hav-input-switch {
+  fill: var(--bg-elev);
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+.hav-input-switch.is-on {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+}
+.hav-input-stem {
+  stroke: var(--text);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke 0.15s ease;
+}
+.hav-input-stem.is-on { stroke: var(--accent-hover); }
+.hav-input-hit { fill: transparent; cursor: pointer; }
+.hav-input-group { cursor: pointer; }
+.hav-input-box {
+  fill: var(--bg-card);
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+.hav-input-group:hover .hav-input-box {
+  stroke: var(--accent);
+}
+.hav-input-box.is-on {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+}
+.hav-input-letter {
+  font-size: 14px;
+  font-weight: 700;
+  fill: var(--text);
+  text-anchor: middle;
+}
+.hav-input-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  fill: var(--accent-hover);
+  text-anchor: middle;
+}
+.hav-junction {
+  fill: var(--bg-card);
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+.hav-junction.is-live {
+  fill: #E8A93A;
+  stroke: #B07A1A;
+}
+body.is-dark .hav-junction.is-live {
+  fill: #FFCB57;
+  stroke: #B07A1A;
+}
+.hav-out-tag {
+  fill: var(--text);
+}
+body.is-dark .hav-out-tag { fill: #14171B; }
+.hav-out-tag-text {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  fill: var(--bg);
+  text-anchor: middle;
+}
+body.is-dark .hav-out-tag-text { fill: var(--text); }
+.hav-wire {
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.45;
+  transition: stroke 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+}
+.hav-wire.is-live {
+  stroke: #E8A93A;
+  opacity: 1;
+  filter: drop-shadow(0 0 3px rgba(232, 169, 58, 0.55));
+}
+body.is-dark .hav-wire.is-live {
+  stroke: #FFCB57;
+  filter: drop-shadow(0 0 4px rgba(255, 203, 87, 0.7));
+}
+.hav-gate-body, .hav-gate-extra {
+  fill: var(--bg-card);
+  stroke: var(--text);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+.hav-gate-extra { fill: none; }
+.hav-gate.is-active .hav-gate-body {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+}
+.hav-gate.is-active .hav-gate-extra {
+  stroke: var(--accent);
+}
+.hav-gate-name {
+  font-size: 9px;
+  font-weight: 700;
+  fill: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+.hav-gate.is-active .hav-gate-name { fill: var(--accent-hover); }
+
+.hav-out-box {
+  fill: var(--bg-card);
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+.hav-out-box.is-on {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+}
+.hav-out-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  fill: var(--text-muted);
+}
+.hav-out-sublabel {
+  font-size: 8px;
+  fill: var(--text-muted);
+  font-style: italic;
+}
+.hav-out-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 38px;
+  font-weight: 700;
+  fill: var(--accent-hover);
+  text-anchor: middle;
+}
+
+/* Töflur fyrir XOR og AND */
+.hav-tables {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+.hav-table-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: center;
+}
+.hav-table-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.hav-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+.hav-table th {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  text-align: center;
+}
+.hav-table td {
+  padding: 0.3rem 0.85rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}
+.hav-table .hav-out.is-true {
+  background: rgba(46, 125, 95, 0.18);
+  color: #1F5C44;
+  font-weight: 700;
+}
+body.is-dark .hav-table .hav-out.is-true {
+  background: rgba(111, 191, 147, 0.18);
+  color: #A8E5C0;
+}
+.hav-table tr.is-current td {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+body.is-dark .hav-table tr.is-current td { color: #14171B; }
+.hav-table tr.is-current .hav-out.is-true {
+  background: var(--accent-hover);
+}
+
+/* Niðurstöðukassi */
+.hav-result {
+  font-size: 1rem;
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  text-align: center;
+  color: var(--text);
+}
+.hav-result-eq {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 700;
+}
+.hav-result-bin {
+  display: inline-flex;
+  gap: 0.15rem;
+  margin: 0 0.2rem;
+}
+.hav-result-bit {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  background: var(--bg-elev);
+  color: var(--text-muted);
+}
+.hav-result-bit.is-on {
+  background: var(--accent);
+  color: #fff;
+}
+body.is-dark .hav-result-bit.is-on { color: #14171B; }
+.hav-result-tail {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* ----------------------------------------------------------------------
+   Skýringarmynd: Sanngildistöflu-skoðari (6 rökhlið)
+   ---------------------------------------------------------------------- */
+.tt-figure {
+  margin: 3rem 0;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.tt-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.tt-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 50ch;
+  line-height: 1.5;
+}
+.tt-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+.tt-pill {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.45rem 0.95rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.tt-pill:hover { border-color: var(--accent); }
+.tt-pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.tt-pill.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+body.is-dark .tt-pill.is-active { color: #14171B; }
+
+.tt-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  max-width: 540px;
+  padding: 1rem 1.1rem 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.tt-symbol-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tt-symbol {
+  width: 100%;
+  max-width: 160px;
+}
+.tt-symbol-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.tt-symbol-body path,
+.tt-symbol-body .tt-symbol-extra {
+  fill: var(--bg-elev);
+  stroke: var(--text);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.tt-symbol-body .tt-symbol-extra { fill: none; }
+.tt-symbol-bubble {
+  fill: var(--bg-card);
+  stroke: var(--text);
+  stroke-width: 1.6;
+}
+.tt-symbol-line {
+  stroke: var(--text);
+  stroke-width: 1.6;
+  fill: none;
+}
+.tt-symbol-label {
+  font-size: 6px;
+  font-weight: 700;
+  fill: var(--text-muted);
+}
+.tt-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+.tt-formula {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  color: var(--accent-hover);
+}
+.tt-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 22ch;
+  text-wrap: pretty;
+}
+
+.tt-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.tt-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.tt-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.tt-toggle-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  width: 1.5rem;
+  color: var(--text);
+}
+.tt-toggle-btns {
+  display: flex;
+  gap: 0.3rem;
+}
+.tt-toggle-btn {
+  appearance: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  width: 2.2rem;
+  padding: 0.3rem 0;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-elev);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+}
+.tt-toggle-btn:hover { border-color: var(--accent); }
+.tt-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.tt-toggle-btn.is-on {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+body.is-dark .tt-toggle-btn.is-on { color: #14171B; }
+
+.tt-q-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-elev);
+  border-radius: 5px;
+}
+.tt-q-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.tt-q-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 0.1rem 0.55rem;
+  border-radius: 4px;
+  background: var(--bg-card);
+  font-variant-numeric: tabular-nums;
+}
+.tt-q-value.is-on {
+  background: rgba(46, 125, 95, 0.22);
+  color: #1F5C44;
+}
+body.is-dark .tt-q-value.is-on {
+  background: rgba(111, 191, 147, 0.18);
+  color: #A8E5C0;
+}
+
+.tt-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+.tt-table th {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 700;
+  padding: 0.4rem 0.7rem;
+  text-align: center;
+}
+.tt-table td {
+  padding: 0.35rem 0.7rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+}
+.tt-table tr.is-current td {
+  font-weight: 700;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+.tt-table tr.is-true .tt-out {
+  background: rgba(46, 125, 95, 0.18);
+  color: #1F5C44;
+  font-weight: 700;
+}
+.tt-table tr.is-false .tt-out {
+  background: rgba(176, 60, 60, 0.12);
+  color: #8B2C2C;
+}
+body.is-dark .tt-table tr.is-true .tt-out {
+  background: rgba(111, 191, 147, 0.18);
+  color: #A8E5C0;
+}
+body.is-dark .tt-table tr.is-false .tt-out {
+  background: rgba(229, 115, 115, 0.16);
+  color: #FFB0B0;
+}
+
+@media (max-width: 560px) {
+  .tt-card { grid-template-columns: 1fr; gap: 1rem; }
+}
+.gbuilder-intro {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  max-width: 52ch;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.gbuilder-svg-wrap {
+  width: 100%;
+  max-width: 600px;
+}
+.gbuilder-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;
+}
+.gbuilder-wire-group { cursor: pointer; }
+.gbuilder-wire-group.is-built { cursor: default; }
+.gbuilder-wire-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 18;
+  pointer-events: stroke;
+}
+.gbuilder-wire {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  transition: stroke 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+}
+.gbuilder-wire.is-blueprint {
+  stroke: var(--text-muted);
+  stroke-width: 3;
+  stroke-dasharray: 7 5;
+  opacity: 0.42;
+}
+.gbuilder-wire-group:hover .gbuilder-wire.is-blueprint {
+  stroke: var(--accent);
+  opacity: 0.85;
+  stroke-width: 3.5;
+}
+.gbuilder-wire.is-built {
+  stroke: var(--text);
+  stroke-width: 3;
+  opacity: 0.78;
+}
+.gbuilder-wire.is-built.is-live {
+  stroke: #E8A93A;
+  opacity: 1;
+  filter: drop-shadow(0 0 4px rgba(232, 169, 58, 0.55));
+}
+body.is-dark .gbuilder-wire.is-built.is-live {
+  stroke: #FFCB57;
+  filter: drop-shadow(0 0 5px rgba(255, 203, 87, 0.7));
+}
+
+.gbuilder-switch { cursor: pointer; }
+.gbuilder-switch.is-disabled { cursor: not-allowed; pointer-events: none; opacity: 0.7; }
+
+.gbuilder-progress {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0;
+  min-height: 1.5em;
+}
+.gbuilder-progress.is-complete {
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+.gbuilder-status {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.gbuilder-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.gbuilder-chip-label {
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.gbuilder-chip-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.gbuilder-chip.is-on {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.gbuilder-chip.is-on .gbuilder-chip-value {
+  color: var(--accent-hover);
+}
+
+/* ----------------------------------------------------------------------
+   Sanngildistöflu Boole (kyrr tafla)
+   ---------------------------------------------------------------------- */
+.booletable-figure {
+  margin: 2.5rem 0;
+  padding: 1.5rem 1.25rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+.booletable-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-hover);
+  text-align: center;
+  margin: 0;
+}
+.booletable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  max-width: 440px;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.booletable th {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.88rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+body.is-dark .booletable th { color: #14171B; }
+.booletable td {
+  padding: 0.55rem 1rem;
+  font-size: 1rem;
+  border-top: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.booletable tbody tr:nth-child(odd) td {
+  background: var(--bg-card);
+}
+.booletable-result {
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+.booletable-caption {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 auto;
+  max-width: 50ch;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ----------------------------------------------------------------------
+   Símar og spjaldtölvur
+   ---------------------------------------------------------------------- */
+@media (max-width: 860px) {
+  :root { --header-h: 64px; }
+
+  .menu-toggle { display: inline-flex; }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    width: min(320px, 86vw);
+    height: calc(100vh - var(--header-h));
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    z-index: 40;
+    box-shadow: 2px 0 0 var(--border);
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-scrim {
+    display: block;
+    position: fixed;
+    inset: var(--header-h) 0 0 0;
+    background: rgba(26, 26, 26, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+    z-index: 35;
+  }
+
+  .sidebar-scrim.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .content { padding: 1.25rem 1.25rem 4rem; }
+  .chapter-title { font-size: 1.75rem; }
+  .brand-title { font-size: 1.2rem; }
+  .brand-author { font-size: 0.85rem; }
+  .reading-toolbar { gap: 0.5rem; margin-bottom: 1rem; }
+  .rt-btn { padding: 0.4rem 0.55rem; font-size: 0.85rem; }
+}
+
+@media (max-width: 480px) {
+  .chapter-body p { font-size: 1rem; }
+  .content { padding: 1rem 1.1rem 3rem; }
+  .brand { gap: 0.5rem; }
+  .brand-author {
+    flex-basis: 100%;
+    margin-top: -0.2rem;
+  }
+}
+
+/* Hreyfimyndastilling — virða óskir notenda */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

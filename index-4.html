@@ -1,0 +1,3115 @@
+<!doctype html>
+<html lang="is">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gervigreind</title>
+  <meta name="description" content="Vefbók um gervigreind fyrir íslenska nemendur á unglingastigi." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <a href="#main" class="skip-link">Hoppa í aðalefni</a>
+
+  <header class="site-header">
+    <button class="menu-toggle" type="button" aria-label="Sýna kaflalista" aria-expanded="false" aria-controls="sidebar">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="4" y1="7"  x2="20" y2="7"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="17" x2="20" y2="17"></line>
+      </svg>
+    </button>
+    <div class="brand">
+      <h1 class="brand-title">Gervigreind</h1>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav id="sidebar" class="sidebar" aria-label="Kaflar bókarinnar">
+      <h2 class="sidebar-heading">Efnisyfirlit</h2>
+      <ol id="toc" class="toc"></ol>
+    </nav>
+
+    <div class="sidebar-scrim" id="sidebar-scrim" aria-hidden="true"></div>
+
+    <main id="main" class="content" tabindex="-1">
+      <div class="reading-toolbar" role="toolbar" aria-label="Lesstillingar">
+        <div class="rt-group" role="group" aria-label="Leturstærð">
+          <button id="rt-font-down" class="rt-btn" type="button" aria-label="Minna letur" title="Minna letur">
+            <span class="rt-a-sm" aria-hidden="true">A</span>
+            <span aria-hidden="true">−</span>
+          </button>
+          <button id="rt-font-up" class="rt-btn" type="button" aria-label="Stærra letur" title="Stærra letur">
+            <span class="rt-a-lg" aria-hidden="true">A</span>
+            <span aria-hidden="true">+</span>
+          </button>
+        </div>
+        <span class="rt-divider" aria-hidden="true"></span>
+        <button id="rt-sepia" class="rt-btn" type="button" aria-pressed="false" title="Næturhamur — dökkur bakgrunnur">
+          <span aria-hidden="true">☾</span>
+          <span>Næturhamur</span>
+        </button>
+      </div>
+      <article id="chapter" class="chapter" aria-live="polite"></article>
+    </main>
+  </div>
+
+  <script src="book-data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    /* ---------- Hjálpartól ---------- */
+    function el(tag, attrs, children) {
+      var node = document.createElement(tag);
+      if (attrs) {
+        Object.keys(attrs).forEach(function (k) {
+          if (k === 'class')      node.className = attrs[k];
+          else if (k === 'text')  node.textContent = attrs[k];
+          else if (k === 'html')  node.innerHTML = attrs[k];
+          else                    node.setAttribute(k, attrs[k]);
+        });
+      }
+      (children || []).forEach(function (c) {
+        if (c) node.appendChild(c);
+      });
+      return node;
+    }
+
+    /* Númer eins og „1.3“ — byggt á röð kafla innan eigin hluta. */
+    function chapterNumber(chapter) {
+      var partChapters = bookData.chapters.filter(function (c) { return c.part === chapter.part; });
+      var idx = partChapters.indexOf(chapter);
+      return chapter.part + '.' + (idx + 1);
+    }
+
+    /* ---------- Skýringarmyndir ---------- */
+    function renderVisual(visual) {
+      var key = (visual.description || '').toLowerCase();
+      if (key.indexOf('jacquard') !== -1) {
+        var figure = el('figure');
+        renderLoom(figure);
+        return figure;
+      }
+      if (key.indexOf('enigma') !== -1) {
+        var ef = el('figure');
+        renderEnigma(ef);
+        return ef;
+      }
+      if (key.indexOf('binary search') !== -1) {
+        var bf = el('figure');
+        renderBinarySearch(bf);
+        return bf;
+      }
+      if (key.indexOf('computing power') !== -1) {
+        var pf = el('figure');
+        renderComputerCompare(pf);
+        return pf;
+      }
+      if (key.indexOf('chinese room') !== -1) {
+        var cf = el('figure');
+        renderChineseRoom(cf);
+        return cf;
+      }
+      if (key.indexOf('binary table') !== -1) {
+        var btf = el('figure');
+        renderBinaryTable(btf);
+        return btf;
+      }
+      if (key.indexOf('binary converter') !== -1) {
+        var bcf = el('figure');
+        renderBinaryConverter(bcf);
+        return bcf;
+      }
+      if (key.indexOf('character encoder') !== -1) {
+        var cef = el('figure');
+        renderCharEncoder(cef);
+        return cef;
+      }
+      if (key.indexOf('rgb mixer') !== -1) {
+        var rmf = el('figure');
+        renderRgbMixer(rmf);
+        return rmf;
+      }
+      if (key.indexOf('audio frequency') !== -1) {
+        var aff = el('figure');
+        renderAudioFreq(aff);
+        return aff;
+      }
+      if (key.indexOf('logic diagrams') !== -1) {
+        var ldf = el('figure');
+        renderLogicDiagrams(ldf);
+        return ldf;
+      }
+      if (key.indexOf('monty hall') !== -1) {
+        var mhf = el('figure');
+        renderMontyHall(mhf);
+        return mhf;
+      }
+      if (key.indexOf('logic gates') !== -1) {
+        var lgf = el('figure');
+        renderLogicGates(lgf);
+        return lgf;
+      }
+      if (key.indexOf('half adder') !== -1) {
+        var haf = el('figure');
+        renderHalfAdder(haf);
+        return haf;
+      }
+      if (key.indexOf('boole table') !== -1) {
+        var bbf = el('figure');
+        renderBooleTable(bbf);
+        return bbf;
+      }
+      if (key.indexOf('and circuit') !== -1) {
+        var acf = el('figure');
+        renderAndCircuit(acf);
+        return acf;
+      }
+      if (key.indexOf('or circuit') !== -1) {
+        var ocf = el('figure');
+        renderOrCircuit(ocf);
+        return ocf;
+      }
+      if (key.indexOf('gate builder') !== -1) {
+        var gbf = el('figure');
+        renderGateBuilder(gbf);
+        return gbf;
+      }
+      if (key.indexOf('truth table') !== -1) {
+        var ttf = el('figure');
+        renderTruthTable(ttf);
+        return ttf;
+      }
+      if (key.indexOf('half adder visual') !== -1) {
+        var hav = el('figure');
+        renderHalfAdderVisual(hav);
+        return hav;
+      }
+      // Fallback: einfaldur staðgengill
+      return el('figure', { class: 'visual-placeholder', role: 'img', 'aria-label': visual.description || 'Skýringarmynd' }, [
+        el('p', { class: 'visual-placeholder-label', text: 'Skýringarmynd' + (visual.type ? ' · ' + visual.type : '') }),
+        el('p', { class: 'visual-placeholder-desc',  text: visual.description || 'Mynd kemur hér.' })
+      ]);
+    }
+
+    function renderLoom(figure) {
+      // Sjálfgefið mynstur — tígull. Nemandinn má breyta!
+      var defaultCards = [
+        [1,1,0,0,0,0,1,1],
+        [1,0,1,0,0,1,0,1],
+        [0,1,0,1,1,0,1,0],
+        [0,1,0,1,1,0,1,0],
+        [1,0,1,0,0,1,0,1],
+        [1,1,0,0,0,0,1,1]
+      ];
+      var CARDS = defaultCards.length;
+      var COLS  = defaultCards[0].length;
+      var CARD_MS = 1500;
+
+      figure.className = 'loom-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk sýning á því hvernig gataspjöld stjórna vefnaði');
+
+      figure.appendChild(el('figcaption', {
+        class: 'loom-title',
+        text: 'Hvernig gataspjaldið stjórnar vefnaðinum'
+      }));
+
+      figure.appendChild(el('p', {
+        class: 'loom-hint',
+        text: 'Smelltu á reit til að bæta við eða fjarlægja gat — síðan ýttu á Vefa og sjáðu þitt eigið mynstur vefjast.'
+      }));
+
+      // Spjöldin — hver reitur er hnappur sem nemandinn getur smellt á
+      var cardsSec = el('div', { class: 'loom-section' });
+      cardsSec.appendChild(el('p', { class: 'loom-label', text: 'Gataspjöld' }));
+      var stack = el('div', { class: 'loom-stack' });
+      defaultCards.forEach(function (row, idx) {
+        var card = el('div', { class: 'loom-card', 'data-i': idx, role: 'group',
+                               'aria-label': 'Spjald ' + (idx + 1) });
+        row.forEach(function (v, colIdx) {
+          var isHole = !!v;
+          var cell = el('button', {
+            type: 'button',
+            class: 'loom-cell' + (isHole ? ' is-hole' : ''),
+            'aria-pressed': isHole ? 'true' : 'false',
+            'aria-label': 'Spjald ' + (idx + 1) + ', reitur ' + (colIdx + 1)
+          });
+          cell.addEventListener('click', function () {
+            var nowHole = cell.classList.toggle('is-hole');
+            cell.setAttribute('aria-pressed', nowHole ? 'true' : 'false');
+            // Breyting á mynstri ógildir núverandi vefnað
+            clearWeave();
+          });
+          card.appendChild(cell);
+        });
+        stack.appendChild(card);
+      });
+      cardsSec.appendChild(stack);
+      figure.appendChild(cardsSec);
+
+      // Ör
+      figure.appendChild(el('div', { class: 'loom-arrow', 'aria-hidden': 'true', text: '↓' }));
+
+      // Vefnaður — tómar raðir, fylltar á flugu þegar spilað er
+      var fabricSec = el('div', { class: 'loom-section' });
+      fabricSec.appendChild(el('p', { class: 'loom-label', text: 'Vefnaður' }));
+      var fabric = el('div', { class: 'loom-fabric' });
+      for (var r = 0; r < CARDS; r++) {
+        fabric.appendChild(el('div', { class: 'loom-fabric-row', 'data-i': r }));
+      }
+      fabricSec.appendChild(fabric);
+      figure.appendChild(fabricSec);
+
+      // Hnappar
+      var controls = el('div', { class: 'loom-controls' });
+      var playBtn  = el('button', { class: 'loom-btn loom-btn-primary', type: 'button', text: '▶ Vefa' });
+      var clearBtn = el('button', { class: 'loom-btn',                  type: 'button', text: '✕ Ný spjöld' });
+      controls.appendChild(playBtn);
+      controls.appendChild(clearBtn);
+      figure.appendChild(controls);
+
+      // Staða og hreyfimynd
+      var step = -1;
+      var timer = null;
+
+      function readCard(idx) {
+        var cells = figure.querySelectorAll('.loom-card[data-i="' + idx + '"] .loom-cell');
+        var out = [];
+        for (var i = 0; i < cells.length; i++) {
+          out.push(cells[i].classList.contains('is-hole') ? 1 : 0);
+        }
+        return out;
+      }
+
+      function weaveRow(idx) {
+        var pattern = readCard(idx);
+        var rowEl = figure.querySelector('.loom-fabric-row[data-i="' + idx + '"]');
+        rowEl.innerHTML = '';
+        pattern.forEach(function (v) {
+          rowEl.appendChild(el('span', {
+            class: 'loom-weave' + (v ? ' is-lifted' : ''),
+            'aria-hidden': 'true'
+          }));
+        });
+        // Tryggja að umbreyting ræsist
+        requestAnimationFrame(function () {
+          rowEl.classList.add('is-shown');
+        });
+      }
+
+      function clearWeave() {
+        if (timer) { clearTimeout(timer); timer = null; }
+        step = -1;
+        var cardEls = figure.querySelectorAll('.loom-card');
+        for (var i = 0; i < cardEls.length; i++) {
+          cardEls[i].classList.remove('is-current', 'is-done');
+        }
+        var rowEls = figure.querySelectorAll('.loom-fabric-row');
+        for (var j = 0; j < rowEls.length; j++) {
+          rowEls[j].classList.remove('is-shown');
+          rowEls[j].innerHTML = '';
+        }
+        playBtn.disabled = false;
+        playBtn.textContent = '▶ Vefa';
+      }
+
+      function clearAll() {
+        clearWeave();
+        // Núllstilla líka öll spjöldin
+        var cellEls = figure.querySelectorAll('.loom-cell');
+        for (var k = 0; k < cellEls.length; k++) {
+          cellEls[k].classList.remove('is-hole');
+          cellEls[k].setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      function applyCardStates() {
+        var cardEls = figure.querySelectorAll('.loom-card');
+        for (var i = 0; i < cardEls.length; i++) {
+          cardEls[i].classList.toggle('is-current', i === step);
+          cardEls[i].classList.toggle('is-done',    i <  step);
+        }
+      }
+
+      function tick() {
+        timer = null;
+        if (!document.contains(figure)) return;
+        step++;
+        applyCardStates();
+        weaveRow(step);
+        if (step >= CARDS - 1) {
+          playBtn.textContent = '✓ Búið';
+          return;
+        }
+        timer = setTimeout(tick, CARD_MS);
+      }
+
+      playBtn.addEventListener('click', function () {
+        if (timer) return;
+        if (step >= CARDS - 1) clearWeave();
+        playBtn.disabled = true;
+        tick();
+      });
+      clearBtn.addEventListener('click', clearAll);
+    }
+
+    /* ---------- Enigma-þraut ---------- */
+    function renderEnigma(figure) {
+      // Þrjú hjól — útgáfa af raunverulegu Enigma I, II, III þar sem þeir
+      // örfáu föstu punktar sem upprunalegu rótorarnir höfðu hafa verið færðir
+      // til (nú derangement: enginn stafur fer í sjálfan sig). Endurspegillinn
+      // UKW-B er involution án fastra punkta — ÞAÐ er það sem tryggir að enginn
+      // stafur kortleggi á sjálfan sig í heildarferlinu, óháð stillingunni.
+      function strToPerm(s) {
+        var p = [];
+        for (var i = 0; i < 26; i++) p.push(s.charCodeAt(i) - 65);
+        return p;
+      }
+      function invPerm(p) {
+        var inv = new Array(26);
+        for (var i = 0; i < 26; i++) inv[p[i]] = i;
+        return inv;
+      }
+
+      var R1  = strToPerm('EKMFLGDQVZNTOWYHXUPSAIBRCJ');
+      var R2  = strToPerm('JADKSIRUXBLHWTMCQGZNPYFVOE');
+      var R3  = strToPerm('BDFHJLCPRTXVNZYEIWGAKMUSQO');
+      var REF = strToPerm('YRUHQSLDPXNGOKMIEBFZCWVJAT');
+      var R1i = invPerm(R1), R2i = invPerm(R2), R3i = invPerm(R3);
+
+      function idx(ch) { return ch.charCodeAt(0) - 65; }
+      function ltr(n)  { return String.fromCharCode(65 + ((n % 26) + 26) % 26); }
+
+      // Stafur fer í gegnum hjól sem er stillt í stöðu `pos`: skiptir um inn-/útgang
+      // sem nemur stöðunni (enska: "ringstellung"-líkt).
+      function through(perm, pos, x) {
+        return ((perm[(x + pos) % 26] - pos) % 26 + 26) % 26;
+      }
+
+      // Enigma-líkt dulmál: inn → R1 → R2 → R3 → endurspegill → R3⁻¹ → R2⁻¹ → R1⁻¹ → út.
+      // Þetta er involution (enc er einnig dec) og enginn stafur fer í sjálfan sig
+      // vegna eiginleika endurspegilsins.
+      function encChar(x, p1, p2, p3) {
+        x = through(R1, p1, x);
+        x = through(R2, p2, x);
+        x = through(R3, p3, x);
+        x = REF[x];
+        x = through(R3i, p3, x);
+        x = through(R2i, p2, x);
+        x = through(R1i, p1, x);
+        return x;
+      }
+      function encString(s, p1, p2, p3) {
+        var out = '';
+        for (var i = 0; i < s.length; i++) {
+          var c = s.charCodeAt(i) - 65;
+          if (c < 0 || c >= 26) { out += s[i]; continue; }
+          // Hægra hjólið (R1) snýst um eitt skref fyrir hvern staf — eins og í
+          // raunverulegri Enigma. Því kortleggjast endurteknir stafir í mismunandi
+          // dulmálsstafi (engin „EE“ → „OO“ pörun).
+          out += String.fromCharCode(65 + encChar(c, (p1 + i) % 26, p2, p3));
+        }
+        return out;
+      }
+
+      // Enigma notar 26 stafa latneskt stafróf. Operatorarnir skrifuðu Ö sem OE,
+      // svo SEELÖWE varð að SEELOWE í raunverulegum skilaboðum.
+      var plaintext     = 'SEELOWE';
+      var displaySolved = 'SEELÖWE';   // birtist í afkóðunarröðinni þegar leyst
+      var I_CORRECT     = idx('S');
+      var II_CORRECT    = idx('E');
+      var III_CORRECT   = idx('A');
+
+      var ciphertext = encString(plaintext, I_CORRECT, II_CORRECT, III_CORRECT);
+      var unlocked = false;
+
+      figure.className = 'enigma-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk Enigma-þraut');
+
+      figure.appendChild(el('figcaption', { class: 'enigma-title', text: 'Leystu dulmálið' }));
+      var hintEl = el('p', {
+        class: 'enigma-hint',
+        text: 'Við þekkjum allar stillingarnar nema eina. Finndu réttu stillinguna fyrir Hjól III til að afhjúpa leyniorðið.'
+      });
+      figure.appendChild(hintEl);
+
+      // Smíðar eitt hjól — sömu byggingu hvort sem það er læst eða ekki
+      function buildRotor(label, initialVal, locked) {
+        var val = initialVal;
+        var rotor = el('div', { class: 'enigma-rotor ' + (locked ? 'is-locked' : 'is-active') });
+        rotor.appendChild(el('span', { class: 'enigma-rotor-label', text: label }));
+
+        var upBtn   = el('button', { class: 'enigma-rotor-btn', type: 'button',
+                                      'aria-label': label + ': næsti stafur', text: '▲' });
+        var letter  = el('div', { class: 'enigma-rotor-letter',
+                                   role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true',
+                                   text: ltr(val) });
+        var downBtn = el('button', { class: 'enigma-rotor-btn', type: 'button',
+                                      'aria-label': label + ': fyrri stafur', text: '▼' });
+        var status  = el('span', { class: 'enigma-rotor-status', text: '🔒 Læst' });
+
+        rotor.appendChild(upBtn);
+        rotor.appendChild(letter);
+        rotor.appendChild(downBtn);
+        rotor.appendChild(status);
+
+        upBtn.addEventListener('click', function () {
+          val = (val + 1) % 26;
+          letter.textContent = ltr(val);
+          update();
+        });
+        downBtn.addEventListener('click', function () {
+          val = (val - 1 + 26) % 26;
+          letter.textContent = ltr(val);
+          update();
+        });
+
+        return {
+          el: rotor,
+          val: function () { return val; },
+          unlock: function () {
+            rotor.classList.remove('is-locked');
+            rotor.classList.add('is-active');
+          }
+        };
+      }
+
+      var rotors = el('div', { class: 'enigma-rotors' });
+      var rotorI   = buildRotor('Hjól I',   I_CORRECT,   true);
+      var rotorII  = buildRotor('Hjól II',  II_CORRECT,  true);
+      var rotorIII = buildRotor('Hjól III', idx('G'),    false);   // byrjar á röngu
+      rotors.appendChild(rotorI.el);
+      rotors.appendChild(rotorII.el);
+      rotors.appendChild(rotorIII.el);
+      figure.appendChild(rotors);
+
+      // Dulmál og afkóðuð röð
+      var displays = el('div', { class: 'enigma-displays' });
+
+      var cipherRow = el('div', { class: 'enigma-row' });
+      cipherRow.appendChild(el('span', { class: 'enigma-row-label', text: 'Dulmál' }));
+      var cipherCells = el('div', { class: 'enigma-cells' });
+      for (var i = 0; i < ciphertext.length; i++) {
+        cipherCells.appendChild(el('span', { class: 'enigma-cell is-cipher', text: ciphertext[i] }));
+      }
+      cipherRow.appendChild(cipherCells);
+      displays.appendChild(cipherRow);
+
+      var plainRow = el('div', { class: 'enigma-row' });
+      plainRow.appendChild(el('span', { class: 'enigma-row-label', text: 'Afkóðað' }));
+      var plainCells = el('div', { class: 'enigma-cells' });
+      for (var j = 0; j < plaintext.length; j++) {
+        plainCells.appendChild(el('span', { class: 'enigma-cell is-plain', text: '·' }));
+      }
+      plainRow.appendChild(plainCells);
+      displays.appendChild(plainRow);
+
+      figure.appendChild(displays);
+
+      // Staðfestingarboð (falinn í fyrstu)
+      var success = el('div', { class: 'enigma-success', role: 'status', 'aria-live': 'polite' });
+      var s1 = el('strong', { text: 'Rétt! ' });
+      success.appendChild(s1);
+      success.appendChild(document.createTextNode(
+        'SEELÖWE var dulnefni nasistanna yfir fyrirhugaðri innrás í Bretland árið 1940. ' +
+        'Bombe-vél Turings þurfti að prófa allar 17.576 mögulegar stillingar til að finna svona lausn — oft á nokkrum mínútum.'
+      ));
+      figure.appendChild(success);
+
+      function update() {
+        var iV   = rotorI.val();
+        var iiV  = rotorII.val();
+        var iiiV = rotorIII.val();
+        // Enigma er involution: afkóðun = endurkóðun með sömu stillingu.
+        var decoded = encString(ciphertext, iV, iiV, iiiV);
+        var solved = (iV === I_CORRECT && iiV === II_CORRECT && iiiV === III_CORRECT);
+        // Þegar leyst, sýnum við hina íslensku rithátt með Ö í stað OE.
+        var display = solved ? displaySolved : decoded;
+        var cells = plainCells.children;
+        for (var i = 0; i < display.length; i++) {
+          cells[i].textContent = display[i];
+        }
+        figure.classList.toggle('is-solved', solved);
+        if (solved && !unlocked) {
+          unlocked = true;
+          rotorI.unlock();
+          rotorII.unlock();
+          hintEl.textContent = 'Öll hjól eru nú opin. Prófaðu mismunandi stillingar og sjáðu hvernig dulmálið breytist.';
+        }
+      }
+
+      update();
+    }
+
+    /* ---------- Tvíleit (gagnvirkur leikur) ---------- */
+    function renderBinarySearch(figure) {
+      var SIZE = 100;
+      var target = 0;
+      var clicks = 0;
+      var solved = false;
+
+      figure.className = 'binsearch-figure';
+      figure.setAttribute('aria-label', 'Gagnvirkur tvíleitarleikur');
+
+      figure.appendChild(el('figcaption', {
+        class: 'binsearch-title',
+        text: 'Prófaðu tvíleitina — finndu töluna'
+      }));
+      figure.appendChild(el('p', {
+        class: 'binsearch-hint',
+        text: 'Smelltu á tölu til að giska. Þú getur útilokað helmninginn í einu. Reyndu að finna töluna með sem fæstum smellum.'
+      }));
+
+      var meter = el('div', { class: 'binsearch-meter' });
+      var counter = el('span', { class: 'binsearch-counter', text: 'Smellir: 0' });
+      meter.appendChild(counter);
+      figure.appendChild(meter);
+
+      var grid = el('div', { class: 'binsearch-grid', role: 'group',
+                              'aria-label': 'Tölur 1 til 100' });
+      var cells = [];
+      for (var i = 1; i <= SIZE; i++) {
+        var btn = el('button', { class: 'binsearch-cell', type: 'button',
+                                  text: String(i), 'data-n': String(i) });
+        btn.addEventListener('click', onCellClick);
+        grid.appendChild(btn);
+        cells.push(btn);
+      }
+      figure.appendChild(grid);
+
+      var result = el('div', { class: 'binsearch-result', role: 'status', 'aria-live': 'polite' });
+      figure.appendChild(result);
+
+      var controls = el('div', { class: 'binsearch-controls' });
+      var resetBtn = el('button', { class: 'binsearch-btn', type: 'button', text: '↻ Ný tala' });
+      controls.appendChild(resetBtn);
+      figure.appendChild(controls);
+
+      function onCellClick() {
+        if (solved) return;
+        if (this.disabled) return;
+        var n = parseInt(this.getAttribute('data-n'), 10);
+        clicks++;
+        counter.textContent = 'Smellir: ' + clicks;
+        if (n === target) {
+          solved = true;
+          for (var k = 0; k < SIZE; k++) {
+            if (!cells[k].classList.contains('is-out')) {
+              cells[k].classList.add('is-correct');
+            }
+            cells[k].disabled = true;
+          }
+          result.textContent = 'Þú fandst töluna ' + target + ' á ' + clicks +
+                                ' smellum! Tvíleit þarf aldrei fleiri en 7 smelli til að finna tölu á bilinu 1–100.';
+          result.classList.add('is-visible');
+        } else if (n < target) {
+          for (var a = 1; a <= n; a++) {
+            cells[a - 1].classList.add('is-out');
+            cells[a - 1].disabled = true;
+          }
+        } else {
+          for (var b = n; b <= SIZE; b++) {
+            cells[b - 1].classList.add('is-out');
+            cells[b - 1].disabled = true;
+          }
+        }
+      }
+
+      function reset() {
+        target = Math.floor(Math.random() * SIZE) + 1;
+        clicks = 0;
+        solved = false;
+        counter.textContent = 'Smellir: 0';
+        result.textContent = '';
+        result.classList.remove('is-visible');
+        for (var k = 0; k < SIZE; k++) {
+          cells[k].classList.remove('is-out', 'is-correct');
+          cells[k].disabled = false;
+        }
+      }
+
+      resetBtn.addEventListener('click', reset);
+      reset();
+    }
+
+    /* ---------- Reikniaflssamanburður (pixla-teikning) ---------- */
+    function renderComputerCompare(figure) {
+      var HEART = [
+        '0000011100011100',
+        '0001111111111110',
+        '0011111111111111',
+        '0111111111111111',
+        '0111111111111111',
+        '0111111111111111',
+        '0011111111111110',
+        '0001111111111100',
+        '0000111111111000',
+        '0000011111110000',
+        '0000001111100000',
+        '0000000111000000',
+        '0000000010000000',
+        '0000000000000000',
+        '0000000000000000',
+        '0000000000000000'
+      ];
+      var GRID_N = 16;
+      var TOTAL = GRID_N * GRID_N;
+
+      var bits = [];
+      for (var r = 0; r < GRID_N; r++) {
+        for (var c = 0; c < GRID_N; c++) {
+          bits.push(HEART[r][c] === '1' ? 1 : 0);
+        }
+      }
+
+      // Hver tölva er skilgreind með nafni, stuttu nafni og fjölda ms á pixil.
+      var COMPUTERS = [
+        { name: 'Klapparstígur (IBM 1401, 1963)', shortName: 'Klapparstígur', ms: 55       },
+        { name: 'Apollo (AGC, 1969)',              shortName: 'Apollo',         ms: 125      },
+        { name: 'Sinclair ZX Spectrum (1982)',     shortName: 'ZX Spectrum',    ms: 1.4      },
+        { name: 'PlayStation 1 (1994)',            shortName: 'PlayStation 1',  ms: 0.17     },
+        { name: 'iPhone 1 (2007)',                 shortName: 'iPhone 1',       ms: 0.012    },
+        { name: 'Snjallsími (2026)',                shortName: 'Snjallsími',     ms: 0.0003   }
+      ];
+
+      // Íslensk talnasnið: þúsundakomma er punktur, tugakomma er komma.
+      function fmtNumber(n) {
+        var rounded = Math.round(n);
+        var s = String(rounded);
+        var out = '';
+        for (var i = 0; i < s.length; i++) {
+          if (i > 0 && (s.length - i) % 3 === 0) out += '.';
+          out += s[i];
+        }
+        return out;
+      }
+      function fmtTime(ms) {
+        if (ms < 1)      return ms.toFixed(3) + ' ms';
+        if (ms < 10)     return ms.toFixed(2) + ' ms';
+        if (ms < 1000)   return Math.round(ms) + ' ms';
+        if (ms < 60000)  return (ms / 1000).toFixed(2).replace('.', ',') + ' s';
+        var minutes = Math.floor(ms / 60000);
+        var seconds = Math.round((ms % 60000) / 1000);
+        return minutes + ' mín ' + seconds + ' s';
+      }
+      function fmtRatio(r) {
+        if (r < 10)        return r.toFixed(1).replace('.', ',');
+        if (r < 1000)      return String(Math.round(r));
+        if (r < 1000000)   return fmtNumber(r);
+        return fmtNumber(r / 1000000) + ' milljón';
+      }
+
+      figure.className = 'pxcompare-figure';
+      figure.setAttribute('aria-label', 'Samanburður á reikniafli tölva');
+
+      figure.appendChild(el('figcaption', {
+        class: 'pxcompare-title',
+        text: 'Berðu saman — hversu lengi tekur það?'
+      }));
+      figure.appendChild(el('p', {
+        class: 'pxcompare-hint',
+        text: 'Sjáðu hve hratt ólíkar tölvur unnu.'
+      }));
+
+      function buildPanel(initialIdx) {
+        var p = el('div', { class: 'pxcompare-panel' });
+
+        var select = el('select', { class: 'pxcompare-select', 'aria-label': 'Velja tölvu' });
+        COMPUTERS.forEach(function (c, i) {
+          var opt = el('option', { value: String(i), text: c.name });
+          if (i === initialIdx) opt.selected = true;
+          select.appendChild(opt);
+        });
+        p.appendChild(select);
+
+        var grid = el('div', { class: 'pxgrid', role: 'img',
+                                'aria-label': 'Pixla-rist 16 sinnum 16' });
+        var cells = [];
+        for (var i = 0; i < TOTAL; i++) {
+          var cell = el('div', { class: 'pxgrid-cell' });
+          grid.appendChild(cell);
+          cells.push(cell);
+        }
+        p.appendChild(grid);
+
+        var clock = el('div', { class: 'pxgrid-clock', text: '0 ms' });
+        p.appendChild(clock);
+
+        return {
+          el: p,
+          select: select,
+          cells: cells,
+          clock: clock,
+          selectedIdx: initialIdx,
+          finalTime: 0,
+          done: false
+        };
+      }
+
+      var panels = el('div', { class: 'pxcompare-panels' });
+      var panelA = buildPanel(0);   // Klapparstígur sjálfgefið vinstri
+      var panelB = buildPanel(5);   // Snjallsími sjálfgefið hægri
+      panels.appendChild(panelA.el);
+      panels.appendChild(panelB.el);
+      figure.appendChild(panels);
+
+      var controls = el('div', { class: 'pxcompare-controls' });
+      var drawBtn  = el('button', { class: 'pxcompare-btn pxcompare-btn-primary',
+                                     type: 'button', text: '▶ Teikna' });
+      var clearBtn = el('button', { class: 'pxcompare-btn', type: 'button', text: '✕ Hreinsa' });
+      controls.appendChild(drawBtn);
+      controls.appendChild(clearBtn);
+      figure.appendChild(controls);
+
+      var compareLine = el('p', { class: 'pxcompare-result',
+                                   role: 'status', 'aria-live': 'polite' });
+      figure.appendChild(compareLine);
+
+      // Sameiginlegt tilför-tilvísanir — hver teikning fær sitt token; það sem er ekki
+      // nyjasta er hunsað.
+      var runToken = 0;
+      var animating = false;
+
+      function resetPanelVisual(p) {
+        for (var i = 0; i < TOTAL; i++) {
+          p.cells[i].classList.remove('is-drawn', 'is-fg');
+        }
+        p.clock.textContent = '0 ms';
+        p.done = false;
+        p.finalTime = 0;
+      }
+
+      function clearAll() {
+        runToken++;
+        animating = false;
+        resetPanelVisual(panelA);
+        resetPanelVisual(panelB);
+        compareLine.textContent = '';
+        compareLine.classList.remove('is-visible');
+        drawBtn.disabled = false;
+        drawBtn.textContent = '▶ Teikna';
+      }
+
+      function drawPanel(panel, comp, myToken) {
+        var start = performance.now();
+        var msPerPixel = comp.ms;
+        var totalDuration = msPerPixel * TOTAL;
+        var drawn = 0;
+
+        function tick() {
+          if (myToken !== runToken) return;
+          if (!document.contains(figure)) return;
+
+          var elapsed = performance.now() - start;
+          var target = Math.min(Math.floor(elapsed / msPerPixel), TOTAL);
+
+          for (var i = drawn; i < target; i++) {
+            panel.cells[i].classList.add('is-drawn');
+            if (bits[i]) panel.cells[i].classList.add('is-fg');
+          }
+          drawn = target;
+
+          var displayTime = Math.min(elapsed, totalDuration);
+          panel.clock.textContent = fmtTime(displayTime);
+
+          if (drawn < TOTAL) {
+            requestAnimationFrame(tick);
+          } else {
+            // ±10% hættutala sínna þtt að sami tími bírtist aldrei tvisvar
+            var jitter = 1 + (Math.random() - 0.5) * 0.2;
+            panel.finalTime = totalDuration * jitter;
+            panel.clock.textContent = fmtTime(panel.finalTime);
+            panel.done = true;
+            checkBothDone();
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+
+      function startDrawing() {
+        if (animating) return;
+        animating = true;
+        drawBtn.disabled = true;
+        drawBtn.textContent = '⏳ Teiknar…';
+        compareLine.textContent = '';
+        compareLine.classList.remove('is-visible');
+
+        resetPanelVisual(panelA);
+        resetPanelVisual(panelB);
+
+        panelA.selectedIdx = parseInt(panelA.select.value, 10);
+        panelB.selectedIdx = parseInt(panelB.select.value, 10);
+
+        var myToken = ++runToken;
+        drawPanel(panelA, COMPUTERS[panelA.selectedIdx], myToken);
+        drawPanel(panelB, COMPUTERS[panelB.selectedIdx], myToken);
+      }
+
+      function checkBothDone() {
+        if (!panelA.done || !panelB.done) return;
+        animating = false;
+        drawBtn.disabled = false;
+        drawBtn.textContent = '▶ Teikna';
+
+        var aTime = panelA.finalTime;
+        var bTime = panelB.finalTime;
+        var aName = COMPUTERS[panelA.selectedIdx].shortName;
+        var bName = COMPUTERS[panelB.selectedIdx].shortName;
+
+        var msg;
+        if (panelA.selectedIdx === panelB.selectedIdx) {
+          msg = 'Sama tölva á báðum hliðum — aðeins lauslegur munur vegna slæðu.';
+        } else {
+          var ratio = aTime > bTime ? (aTime / bTime) : (bTime / aTime);
+          var slow  = aTime > bTime ? aName : bName;
+          var fast  = aTime > bTime ? bName : aName;
+          if (ratio < 1.5) {
+            msg = slow + ' og ' + fast + ' tóku nokkuð sams konar tíma.';
+          } else {
+            msg = slow + ' tók ' + fmtRatio(ratio) + ' sinnum lengur en ' + fast + '.';
+          }
+        }
+        compareLine.textContent = msg;
+        compareLine.classList.add('is-visible');
+      }
+
+      drawBtn.addEventListener('click', startDrawing);
+      clearBtn.addEventListener('click', clearAll);
+    }
+
+    /* ---------- Kínverska herbergið (gagnvirkur leikur) ---------- */
+    function renderChineseRoom(figure) {
+      figure.className = 'chinroom-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk útgáfa af Kínverska herberginu eftir John Searle');
+
+      figure.appendChild(el('figcaption', { class: 'chinroom-title', text: 'Kínverska herbergið' }));
+      figure.appendChild(el('p', {
+        class: 'chinroom-intro',
+        text: 'Þú ert lokuð inni í herbergi. Þú skilur ekki kínversku — en á borðinu er bók með reglum. Tákn rennur inn undir hurðinni og þú notar regluna til að senda rétt tákn til baka.'
+      }));
+
+      // Reglurnar — dýr og umhverfi, einfalt að passa saman án að skilja kínversku
+      var RULES = [
+        { input: '鱼', output: '海' },   // fiskur → haf
+        { input: '鸟', output: '天' },   // fugl → himinn
+        { input: '象', output: '地' },   // fíll → jörð
+        { input: '树', output: '林' }    // tré → skógur
+      ];
+
+      figure.appendChild(el('div', { class: 'chinroom-section-label', text: 'Reglubókin' }));
+      var rulesGrid = el('div', { class: 'chinroom-rules' });
+      RULES.forEach(function (r) {
+        var item = el('div', { class: 'chinroom-rule' });
+        item.appendChild(el('span', { class: 'chinroom-rule-in',    text: r.input  }));
+        item.appendChild(el('span', { class: 'chinroom-rule-arrow', text: '→'      }));
+        item.appendChild(el('span', { class: 'chinroom-rule-out',   text: r.output }));
+        rulesGrid.appendChild(item);
+      });
+      figure.appendChild(rulesGrid);
+
+      figure.appendChild(el('div', { class: 'chinroom-section-label', text: 'Tákn rann inn um hurðina' }));
+      var promptBox = el('div', { class: 'chinroom-prompt',
+                                   role: 'status', 'aria-live': 'polite' });
+      figure.appendChild(promptBox);
+
+      figure.appendChild(el('p', { class: 'chinroom-answer-label',
+                                    text: 'Hvaða tákn áttu að senda til baka?' }));
+
+      var answersRow = el('div', { class: 'chinroom-answers' });
+      figure.appendChild(answersRow);
+
+      var feedback = el('div', { class: 'chinroom-feedback',
+                                  role: 'status', 'aria-live': 'polite' });
+      figure.appendChild(feedback);
+
+      var nextBtn = el('button', { class: 'chinroom-next', type: 'button',
+                                    text: '↻ Næsta tákn' });
+      figure.appendChild(nextBtn);
+
+      figure.appendChild(el('p', {
+        class: 'chinroom-caption',
+        text: 'Þú getur svarað rétt án þess að skilja kínversku.'
+      }));
+
+      var currentRule = null;
+
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      function newPrompt() {
+        currentRule = RULES[Math.floor(Math.random() * RULES.length)];
+        promptBox.textContent = currentRule.input;
+        answersRow.innerHTML = '';
+        shuffle(RULES).forEach(function (r) {
+          var btn = el('button', {
+            class: 'chinroom-answer', type: 'button',
+            text: r.output,
+            'aria-label': 'Velja svar ' + r.output
+          });
+          btn.addEventListener('click', function () { onAnswer(r, btn); });
+          answersRow.appendChild(btn);
+        });
+        feedback.innerHTML = '';
+        feedback.className = 'chinroom-feedback';
+        nextBtn.style.display = 'none';
+      }
+
+      function onAnswer(r, btn) {
+        var correct = (r.output === currentRule.output);
+        var buttons = answersRow.querySelectorAll('.chinroom-answer');
+        for (var i = 0; i < buttons.length; i++) buttons[i].disabled = true;
+        btn.classList.add(correct ? 'is-correct' : 'is-wrong');
+
+        feedback.className = 'chinroom-feedback ' + (correct ? 'is-correct' : 'is-wrong');
+        var bubble = el('span', { class: 'chinroom-cn' });
+        bubble.textContent = correct ? '这个人会说中文！' : '这是什么乱七八糟！';
+        feedback.innerHTML = '';
+        feedback.appendChild(bubble);
+        nextBtn.style.display = 'inline-flex';
+      }
+
+      nextBtn.addEventListener('click', newPrompt);
+      newPrompt();
+    }
+
+    /* ---------- Samanburðartafla: tugakerfi og tvíundarkerfi ---------- */
+    function renderBinaryTable(figure) {
+      figure.className = 'bintable-figure';
+      figure.setAttribute('aria-label', 'Tafla sem sýnir tölurnar 0 til 10 í tugakerfi og tvíundarkerfi');
+
+      figure.appendChild(el('figcaption', {
+        class: 'bintable-title',
+        text: 'Tölurnar 0–10 í báðum kerfum'
+      }));
+
+      var table = el('table', { class: 'bintable' });
+      var thead = el('thead');
+      var trHead = el('tr');
+      trHead.appendChild(el('th', { scope: 'col', text: 'Tugakerfi' }));
+      trHead.appendChild(el('th', { scope: 'col', text: 'Tvíundarkerfi' }));
+      thead.appendChild(trHead);
+      table.appendChild(thead);
+
+      var tbody = el('tbody');
+      for (var i = 0; i <= 10; i++) {
+        var tr = el('tr');
+        tr.appendChild(el('td', { text: String(i) }));
+        tr.appendChild(el('td', { class: 'bintable-binary', text: i.toString(2) }));
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      figure.appendChild(table);
+    }
+
+    /* ---------- Tvíundabreytir (gagnvirkur) ---------- */
+    function renderBinaryConverter(figure) {
+      figure.className = 'binconv-figure';
+      figure.setAttribute('aria-label', 'Gagnvirkt tæki sem sýnir tugatölu sem tvíundatölu');
+
+      figure.appendChild(el('figcaption', {
+        class: 'binconv-title',
+        text: 'Prófaðu: breyttu tölu í tvíundarkerfi'
+      }));
+
+      var controls = el('div', { class: 'binconv-controls' });
+      var slider = el('input', {
+        type: 'range', min: '0', max: '255', value: '42', step: '1',
+        class: 'binconv-slider', 'aria-label': 'Renna fyrir tugatölu, frá 0 til 255'
+      });
+      var numberInput = el('input', {
+        type: 'number', min: '0', max: '255', value: '42',
+        class: 'binconv-number', 'aria-label': 'Slá inn tugatölu'
+      });
+      controls.appendChild(slider);
+      controls.appendChild(numberInput);
+      figure.appendChild(controls);
+
+      var bits = el('div', { class: 'binconv-bits', role: 'group',
+                              'aria-label': 'Átta bitar með sætisgildi' });
+      var cells = [];
+      for (var b = 7; b >= 0; b--) {
+        var wrap = el('div', { class: 'binconv-bit' });
+        var cell = el('button', {
+          class: 'binconv-bit-cell', type: 'button',
+          text: '0',
+          'aria-pressed': 'false',
+          'aria-label': 'Biti með sætisgildi ' + (1 << b)
+        });
+        var place = el('div', { class: 'binconv-bit-value', text: String(1 << b) });
+        wrap.appendChild(cell);
+        wrap.appendChild(place);
+        bits.appendChild(wrap);
+        cells.push(cell);  // cells[0] = biti 7 (hæstur), cells[7] = biti 0 (lægstur)
+      }
+      figure.appendChild(bits);
+
+      var binaryStr = el('p', { class: 'binconv-string', text: '00101010' });
+      figure.appendChild(binaryStr);
+
+      figure.appendChild(el('p', {
+        class: 'binconv-note',
+        text: 'Sama hugmynd og í Jacquard-vefstólnum — kveikt eða slökkt, 1 eða 0.'
+      }));
+
+      function update(value) {
+        var n = parseInt(value, 10);
+        if (isNaN(n)) n = 0;
+        n = Math.max(0, Math.min(255, n));
+        slider.value = String(n);
+        if (document.activeElement !== numberInput) {
+          numberInput.value = String(n);
+        }
+        var bin = '';
+        for (var b = 7; b >= 0; b--) {
+          bin += ((n >> b) & 1) ? '1' : '0';
+        }
+        binaryStr.textContent = bin;
+        for (var i = 0; i < 8; i++) {
+          var on = bin[i] === '1';
+          cells[i].textContent = on ? '1' : '0';
+          cells[i].classList.toggle('is-on', on);
+          cells[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+        }
+      }
+
+      // Hver bita-reitur er smellanlegur — nemandinn getur smellað 1/0 og byggt sjálfur sinni eigin tölu.
+      cells.forEach(function (cell, i) {
+        cell.addEventListener('click', function () {
+          var bitIndex = 7 - i;        // cells[0] svarar til bita 7 (128), cells[7] svarar til bita 0 (1)
+          var n = parseInt(slider.value, 10) || 0;
+          n = n ^ (1 << bitIndex);
+          update(n);
+        });
+      });
+
+      slider.addEventListener('input', function () { update(this.value); });
+      numberInput.addEventListener('input', function () { update(this.value); });
+      numberInput.addEventListener('blur', function () { update(this.value); });
+
+      update(42);
+    }
+
+    /* ---------- Staftáknun (gagnvirkur kóðari) ---------- */
+    function renderCharEncoder(figure) {
+      figure.className = 'charenc-figure';
+      figure.setAttribute('aria-label', 'Gagnvirkt tæki sem sýnir hvernig stafur er geymdur í tölvu');
+
+      figure.appendChild(el('figcaption', {
+        class: 'charenc-title',
+        text: 'Prófaðu: hvernig er stafurinn geymdur í tölvunni?'
+      }));
+
+      // Skammvalshnappar
+      var quickRow = el('div', { class: 'charenc-quick', role: 'group',
+                                  'aria-label': 'Algengir stafir til að velja' });
+      var QUICK_CHARS = ['A', 'a', 'Þ', 'þ', 'Æ', 'æ', 'Ð', 'ð', '字', '🤓'];
+      QUICK_CHARS.forEach(function (ch) {
+        var btn = el('button', {
+          class: 'charenc-quick-btn', type: 'button',
+          text: ch, 'aria-label': 'Velja staf ' + ch
+        });
+        btn.addEventListener('click', function () {
+          input.value = '';
+          update(ch);
+        });
+        quickRow.appendChild(btn);
+      });
+      figure.appendChild(quickRow);
+
+      // Innsláttur fyrir aðra stafi
+      var inputRow = el('div', { class: 'charenc-input-row' });
+      var inputLabel = el('label', { class: 'charenc-input-label',
+                                      for: 'charenc-input-' + Math.random().toString(36).slice(2, 8),
+                                      text: 'eða sláðu inn staf:' });
+      inputRow.appendChild(inputLabel);
+      var input = el('input', {
+        type: 'text', maxlength: '4',
+        class: 'charenc-input',
+        'aria-label': 'Sláðu inn staf til að umbreyta'
+      });
+      input.id = inputLabel.getAttribute('for');
+      inputRow.appendChild(input);
+      figure.appendChild(inputRow);
+
+      // Stór sýning
+      var display = el('div', { class: 'charenc-display' });
+      var bigChar = el('div', { class: 'charenc-bigchar', text: 'A',
+                                 role: 'status', 'aria-live': 'polite' });
+      display.appendChild(bigChar);
+      var info = el('div', { class: 'charenc-info' });
+      var codePointEl = el('span', { class: 'charenc-info-item charenc-cp',     text: 'U+0041' });
+      var asciiEl     = el('span', { class: 'charenc-info-item charenc-ascii',  text: 'ASCII: 65' });
+      var byteCountEl = el('span', { class: 'charenc-info-item charenc-bytecount', text: '1 bæti (ASCII)' });
+      info.appendChild(codePointEl);
+      info.appendChild(asciiEl);
+      info.appendChild(byteCountEl);
+      display.appendChild(info);
+      figure.appendChild(display);
+
+      // Bætin
+      var bytesArea = el('div', { class: 'charenc-bytes' });
+      figure.appendChild(bytesArea);
+
+      // Tvíundatala (öll bæti samansafnað)
+      var binStrEl = el('p', { class: 'charenc-string', text: '01000001' });
+      figure.appendChild(binStrEl);
+
+      figure.appendChild(el('p', {
+        class: 'charenc-note',
+        text: 'Íslenskir stafir þurfa tvö bæti — enska þarf bara eitt. Þess vegna tekur íslenskur texti meira pláss.'
+      }));
+
+      var encoder = (typeof TextEncoder !== 'undefined') ? new TextEncoder() : null;
+
+      function firstChar(str) {
+        if (!str) return '';
+        // Höndla emoji og aðra stafi utan BMP rétt í gegnum codePointAt
+        return String.fromCodePoint(str.codePointAt(0));
+      }
+
+      function update(ch) {
+        ch = firstChar(ch);
+        if (!ch) return;
+
+        bigChar.textContent = ch;
+
+        var cp = ch.codePointAt(0);
+        var hex = cp.toString(16).toUpperCase();
+        while (hex.length < 4) hex = '0' + hex;
+        codePointEl.textContent = 'U+' + hex;
+
+        if (cp < 128) {
+          asciiEl.textContent = 'ASCII: ' + cp;
+          asciiEl.classList.remove('is-hidden');
+        } else {
+          asciiEl.classList.add('is-hidden');
+        }
+
+        var bytes = encoder ? encoder.encode(ch) : new Uint8Array([cp & 0xFF]);
+        var count = bytes.length;
+        var label;
+        if (count === 1)      label = '1 bæti (ASCII)';
+        else if (count === 2) label = '2 bæti (UTF-8)';
+        else if (count === 3) label = '3 bæti (UTF-8)';
+        else                  label = count + ' bæti (UTF-8)';
+        byteCountEl.textContent = label;
+
+        bytesArea.innerHTML = '';
+        var fullBin = '';
+        for (var i = 0; i < bytes.length; i++) {
+          var byteVal = bytes[i];
+          var byteBits = '';
+          for (var b = 7; b >= 0; b--) byteBits += ((byteVal >> b) & 1) ? '1' : '0';
+          fullBin += byteBits;
+
+          var byteRow = el('div', { class: 'charenc-byte' });
+          byteRow.appendChild(el('div', {
+            class: 'charenc-byte-label',
+            text: 'Bæti ' + (i + 1) + ' — ' + byteVal
+          }));
+
+          var bitRow = el('div', { class: 'charenc-byte-bits' });
+          for (var k = 0; k < 8; k++) {
+            var on = byteBits[k] === '1';
+            bitRow.appendChild(el('div', {
+              class: 'charenc-bit' + (on ? ' is-on' : ''),
+              text: on ? '1' : '0'
+            }));
+          }
+          byteRow.appendChild(bitRow);
+          bytesArea.appendChild(byteRow);
+        }
+
+        // Splittum tvíundastrengnum á bæti-mörk svo hann fái að ofbjóða ekki á símum
+        binStrEl.textContent = fullBin.match(/.{1,8}/g).join(' ');
+      }
+
+      input.addEventListener('input', function () {
+        if (this.value.length > 0) update(this.value);
+      });
+
+      update('A');
+    }
+
+    /* ---------- RGB-litaröð (gagnvirkur litari) ---------- */
+    function renderRgbMixer(figure) {
+      figure.className = 'rgbmix-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk litablöndun með rauðum, grænum og bláum');
+
+      figure.appendChild(el('figcaption', {
+        class: 'rgbmix-title',
+        text: 'Prófaðu: blandaðu litinn þinn'
+      }));
+
+      // Hjarta-mynstrið — miðjusett í 16×16 rist
+      var HEART_ROWS = [
+        '0000000000000000',
+        '0000000000000000',
+        '0000000000000000',
+        '0001100000011000',
+        '0011110000111100',
+        '0111111001111110',
+        '0111111111111110',
+        '0111111111111110',
+        '0011111111111100',
+        '0001111111111000',
+        '0000111111110000',
+        '0000011111100000',
+        '0000001111000000',
+        '0000000110000000',
+        '0000000000000000',
+        '0000000000000000'
+      ];
+      var heart = el('div', { class: 'rgbmix-heart', role: 'img',
+                               'aria-label': 'Hjarta sem litast eftir völdum lit' });
+      var heartCells = [];
+      for (var r = 0; r < HEART_ROWS.length; r++) {
+        for (var c = 0; c < HEART_ROWS[r].length; c++) {
+          var on = HEART_ROWS[r][c] === '1';
+          var cell = el('div', { class: 'rgbmix-heart-cell' + (on ? ' is-fg' : '') });
+          heart.appendChild(cell);
+          if (on) heartCells.push(cell);
+        }
+      }
+      figure.appendChild(heart);
+      var rgbText = el('p', { class: 'rgbmix-rgb', text: 'rgb(100, 100, 100)' });
+      figure.appendChild(rgbText);
+
+      // Skammvals fyrir liti úr kafla
+      var QUICK = [
+        { name: 'Svartur',    r: 0,   g: 0,   b: 0   },
+        { name: 'Hvítur',     r: 255, g: 255, b: 255 },
+        { name: 'Grár',       r: 100, g: 100, b: 100 },
+        { name: 'Rauðbrúnn',  r: 165, g: 42,  b: 42  },
+        { name: 'Fjólublár',  r: 128, g: 0,   b: 128 },
+        { name: 'Bleikur',    r: 255, g: 182, b: 193 }
+      ];
+      var quickRow = el('div', { class: 'rgbmix-quick' });
+      QUICK.forEach(function (c) {
+        var btn = el('button', { class: 'rgbmix-quick-btn', type: 'button',
+                                  'aria-label': 'Velja lit ' + c.name });
+        var dot = el('span', { class: 'rgbmix-quick-dot' });
+        dot.style.backgroundColor = 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')';
+        btn.appendChild(dot);
+        btn.appendChild(document.createTextNode(c.name));
+        btn.addEventListener('click', function () {
+          state.r = c.r; state.g = c.g; state.b = c.b;
+          update();
+        });
+        quickRow.appendChild(btn);
+      });
+      figure.appendChild(quickRow);
+
+      // Þrjár rásir (R/G/B), hver með nafni, gildi, slider og 8 bita-reitum
+      var channelsWrap = el('div', { class: 'rgbmix-channels' });
+      var channels = ['r', 'g', 'b'].map(function (key) {
+        var fullName = key === 'r' ? 'rauður' : key === 'g' ? 'grænn' : 'blár';
+        var ch = el('div', { class: 'rgbmix-channel rgbmix-ch-' + key });
+
+        var head = el('div', { class: 'rgbmix-ch-head' });
+        head.appendChild(el('span', { class: 'rgbmix-ch-label',
+                                       text: key.toUpperCase() + ' — ' + fullName }));
+        var valueEl = el('span', { class: 'rgbmix-ch-value', text: '0' });
+        head.appendChild(valueEl);
+        ch.appendChild(head);
+
+        var slider = el('input', {
+          type: 'range', min: '0', max: '255', value: '0', step: '1',
+          class: 'rgbmix-slider',
+          'aria-label': 'Rás ' + key.toUpperCase() + ': ' + fullName + ' (0 til 255)'
+        });
+        ch.appendChild(slider);
+
+        var bitsRow = el('div', { class: 'rgbmix-bits' });
+        var bitCells = [];
+        for (var i = 0; i < 8; i++) {
+          var cell = el('div', { class: 'rgbmix-bit', text: '0' });
+          bitsRow.appendChild(cell);
+          bitCells.push(cell);
+        }
+        ch.appendChild(bitsRow);
+
+        slider.addEventListener('input', function () {
+          state[key] = parseInt(this.value, 10);
+          update();
+        });
+
+        channelsWrap.appendChild(ch);
+        return { key: key, slider: slider, valueEl: valueEl, bitCells: bitCells };
+      });
+      figure.appendChild(channelsWrap);
+
+      var state = { r: 100, g: 100, b: 100 };
+
+      function update() {
+        var rgbStr = 'rgb(' + state.r + ', ' + state.g + ', ' + state.b + ')';
+        for (var i = 0; i < heartCells.length; i++) {
+          heartCells[i].style.backgroundColor = rgbStr;
+        }
+        rgbText.textContent = rgbStr;
+        channels.forEach(function (c) {
+          var v = state[c.key];
+          if (document.activeElement !== c.slider) c.slider.value = String(v);
+          c.valueEl.textContent = String(v);
+          for (var b = 0; b < 8; b++) {
+            var on = ((v >> (7 - b)) & 1) === 1;
+            c.bitCells[b].textContent = on ? '1' : '0';
+            c.bitCells[b].classList.toggle('is-on', on);
+          }
+        });
+      }
+
+      update();
+    }
+
+    /* ---------- Tíðnis-skoðari (hlustaðu á tóninn) ---------- */
+    function renderAudioFreq(figure) {
+      figure.className = 'audiofreq-figure';
+      figure.setAttribute('aria-label', 'Gagnvirkur tíðnis-skoðari með sínu-bylgju og hljóði');
+
+      figure.appendChild(el('figcaption', {
+        class: 'audiofreq-title',
+        text: 'Prófaðu: hlustaðu á tíðnina'
+      }));
+
+      var hzDisplay = el('p', { class: 'audiofreq-hz', text: '440 Hz' });
+      figure.appendChild(hzDisplay);
+
+      // Slider (lograitmísk skalan: 20 Hz til 20.000 Hz)
+      var sliderWrap = el('div', { class: 'audiofreq-slider-wrap' });
+      var slider = el('input', {
+        type: 'range', min: '0', max: '1000', value: '450', step: '1',
+        class: 'audiofreq-slider',
+        'aria-label': 'Veldu tíðni á bilinu 20 til 20.000 hertz'
+      });
+      sliderWrap.appendChild(slider);
+      var ticks = el('div', { class: 'audiofreq-ticks' });
+      ticks.appendChild(el('span', { text: '20 Hz' }));
+      ticks.appendChild(el('span', { text: '440 Hz' }));
+      ticks.appendChild(el('span', { text: '20.000 Hz' }));
+      sliderWrap.appendChild(ticks);
+      figure.appendChild(sliderWrap);
+
+      var canvas = el('canvas', { class: 'audiofreq-canvas', width: '640', height: '120' });
+      figure.appendChild(canvas);
+      var ctx2d = canvas.getContext('2d');
+
+      var playBtn = el('button', {
+        type: 'button', class: 'audiofreq-play',
+        text: '🔊 Halda inni til að hlusta',
+        'aria-label': 'Halda inni til að hlusta á tóninn'
+      });
+      figure.appendChild(playBtn);
+
+      figure.appendChild(el('p', {
+        class: 'audiofreq-note',
+        text: 'Mannseyrað heyrir á bilinu 20–20.000 Hz. Tónlist á streymisveitum inniheldur 44.100 mælingar á sekúndu — tvöfalt hæstu tíðni sem við heyrum.'
+      }));
+
+      // Lograitmísk umbreyting: slider 0..1000 → 20 Hz .. 20.000 Hz
+      function sliderToFreq(s) {
+        var f = 20 * Math.pow(1000, s / 1000);
+        return Math.round(f);
+      }
+      function fmtHz(f) {
+        if (f >= 1000) return (f / 1000).toFixed(f >= 10000 ? 0 : 1).replace('.', ',') + ' kHz';
+        return f + ' Hz';
+      }
+
+      var currentFreq = 440;
+
+      function updateFreq() {
+        currentFreq = sliderToFreq(parseInt(slider.value, 10));
+        hzDisplay.textContent = fmtHz(currentFreq);
+        if (oscillator) {
+          try { oscillator.frequency.setValueAtTime(currentFreq, audioCtx.currentTime); }
+          catch (e) {}
+        }
+      }
+
+      // Sínbylgja
+      var phase = 0;
+      function drawWave() {
+        var w = canvas.width;
+        var h = canvas.height;
+        ctx2d.clearRect(0, 0, w, h);
+
+        var rootStyle = getComputedStyle(document.body);
+        var accent = rootStyle.getPropertyValue('--accent').trim() || '#2A5C66';
+        var bordercol = rootStyle.getPropertyValue('--border').trim() || '#DAD7CE';
+
+        ctx2d.strokeStyle = bordercol;
+        ctx2d.lineWidth = 1;
+        ctx2d.beginPath();
+        ctx2d.moveTo(0, h / 2);
+        ctx2d.lineTo(w, h / 2);
+        ctx2d.stroke();
+
+        // Fjöldi byklja sem sjást ræðst af tíðni — log-skalast svo lítil og há tíðni eru aðgreinanleg
+        var cycles = Math.max(0.4, Math.log2(currentFreq / 20) * 2.4 + 0.6);
+        if (cycles > 60) cycles = 60;
+        var amp = h * 0.36;
+
+        ctx2d.strokeStyle = accent;
+        ctx2d.lineWidth = 2;
+        ctx2d.beginPath();
+        for (var x = 0; x <= w; x++) {
+          var t = x / w;
+          var y = h / 2 + amp * Math.sin((t * cycles + phase) * Math.PI * 2);
+          if (x === 0) ctx2d.moveTo(x, y);
+          else          ctx2d.lineTo(x, y);
+        }
+        ctx2d.stroke();
+      }
+
+      function animTick() {
+        if (!document.contains(figure)) {
+          stopTone();
+          return;
+        }
+        phase += 0.005 + Math.log10(Math.max(20, currentFreq) / 20) * 0.018;
+        if (phase > 1) phase -= 1;
+        drawWave();
+        requestAnimationFrame(animTick);
+      }
+
+      // Web Audio
+      var audioCtx = null;
+      var oscillator = null;
+      var gainNode = null;
+      var playing = false;
+
+      function ensureAudio() {
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return false;
+          audioCtx = new AC();
+        }
+        if (audioCtx.state === 'suspended') {
+          try { audioCtx.resume(); } catch (e) {}
+        }
+        return true;
+      }
+
+      function startTone() {
+        if (playing) return;
+        if (!ensureAudio()) return;
+        try {
+          oscillator = audioCtx.createOscillator();
+          gainNode = audioCtx.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(currentFreq, audioCtx.currentTime);
+          gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+          gainNode.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.02);
+          oscillator.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          oscillator.start();
+          playing = true;
+          playBtn.classList.add('is-playing');
+        } catch (e) { /* ignore */ }
+      }
+      function stopTone() {
+        if (!playing || !oscillator || !audioCtx) {
+          playing = false;
+          playBtn.classList.remove('is-playing');
+          return;
+        }
+        try {
+          var now = audioCtx.currentTime;
+          gainNode.gain.cancelScheduledValues(now);
+          gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+          gainNode.gain.linearRampToValueAtTime(0, now + 0.03);
+          oscillator.stop(now + 0.05);
+        } catch (e) {}
+        oscillator = null;
+        gainNode = null;
+        playing = false;
+        playBtn.classList.remove('is-playing');
+      }
+
+      slider.addEventListener('input', updateFreq);
+
+      // Pointer (mouse + touch) — halda inni til að hlusta
+      playBtn.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        try { playBtn.setPointerCapture(e.pointerId); } catch (err) {}
+        startTone();
+      });
+      playBtn.addEventListener('pointerup', function (e) {
+        try { playBtn.releasePointerCapture(e.pointerId); } catch (err) {}
+        stopTone();
+      });
+      playBtn.addEventListener('pointercancel', stopTone);
+
+      // Lyklaborð — bil eða Enter til að halda
+      playBtn.addEventListener('keydown', function (e) {
+        if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) {
+          e.preventDefault();
+          startTone();
+        }
+      });
+      playBtn.addEventListener('keyup', function (e) {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          stopTone();
+        }
+      });
+      playBtn.addEventListener('blur', stopTone);
+
+      updateFreq();
+      // Bíðum eftir næsta animation frame svo figure sé komið í DOM
+      requestAnimationFrame(animTick);
+    }
+
+    /* ---------- Rökhugsunarmyndir (rétt og röng röksemdafærsla) ---------- */
+    function renderLogicDiagrams(figure) {
+      figure.className = 'logicdiag-figure';
+      figure.setAttribute('aria-label', 'Tvö dæmi um rökhugsun — rétta og ranga niðurstöðu');
+
+      var pair = el('div', { class: 'logicdiag-pair' });
+
+      function buildColumn(opts) {
+        var col = el('div', { class: 'logicdiag-col' });
+        col.appendChild(el('h4', { class: 'logicdiag-col-title', text: opts.title }));
+        opts.premises.forEach(function (p) {
+          var box = el('div', { class: 'logicdiag-box logicdiag-premise' });
+          box.appendChild(el('span', { class: 'logicdiag-label', text: p.label }));
+          box.appendChild(document.createTextNode(' ' + p.text));
+          col.appendChild(box);
+        });
+        col.appendChild(el('div', { class: 'logicdiag-arrow', 'aria-hidden': 'true', text: '↓' }));
+        var concl = el('div', { class: 'logicdiag-box logicdiag-conclusion logicdiag-conclusion-' + opts.kind });
+        concl.appendChild(el('div', { class: 'logicdiag-conclusion-label', text: opts.conclusionLabel }));
+        concl.appendChild(el('div', { class: 'logicdiag-conclusion-text',  text: opts.conclusionText }));
+        if (opts.hint) {
+          concl.appendChild(el('div', { class: 'logicdiag-conclusion-hint', text: opts.hint }));
+        }
+        col.appendChild(concl);
+        return col;
+      }
+
+      pair.appendChild(buildColumn({
+        title: 'Rétt röksemdafærsla',
+        premises: [
+          { label: 'Forsenda 1:', text: 'Ef það rignir (R) þá er jörðin blaut (B)' },
+          { label: 'Forsenda 2:', text: 'Það er rigning (R)' }
+        ],
+        kind: 'ok',
+        conclusionLabel: '✓ Rökrétt',
+        conclusionText: 'Jörðin er blaut (B)'
+      }));
+
+      pair.appendChild(buildColumn({
+        title: 'Röng röksemdafærsla',
+        premises: [
+          { label: 'Forsenda 1:', text: 'Ef það rignir (R) þá er jörðin blaut (B)' },
+          { label: 'Forsenda 2:', text: 'Jörðin er blaut (B)' }
+        ],
+        kind: 'bad',
+        conclusionLabel: '✗ Ekki rökrétt',
+        conclusionText: 'Það hefur rignt (R)',
+        hint: 'Jörðin gæti verið blaut af öðrum ástæðum.'
+      }));
+
+      figure.appendChild(pair);
+    }
+
+    /* ---------- Monty Hall hermir (gagnvirkur) ---------- */
+    function renderMontyHall(figure) {
+      figure.className = 'monty-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk Monty Hall þraut');
+
+      figure.appendChild(el('figcaption', {
+        class: 'monty-title',
+        text: 'Prófaðu Monty Hall-þrautina'
+      }));
+
+      var promptEl = el('p', { class: 'monty-prompt', role: 'status', 'aria-live': 'polite',
+                                text: 'Veldu eina af þremur dyrum.' });
+      figure.appendChild(promptEl);
+
+      var doorsRow = el('div', { class: 'monty-doors' });
+      var doorEls = [];
+      for (var i = 0; i < 3; i++) {
+        var door = el('button', { class: 'monty-door', type: 'button', 'data-door': String(i),
+                                   'aria-label': 'Dyr ' + (i + 1) });
+        var num = el('div', { class: 'monty-door-num', text: 'Dyr ' + (i + 1) });
+        var content = el('div', { class: 'monty-door-content', text: '?' });
+        door.appendChild(num);
+        door.appendChild(content);
+        door.addEventListener('click', function () {
+          onDoorClick(parseInt(this.getAttribute('data-door'), 10));
+        });
+        doorsRow.appendChild(door);
+        doorEls.push({ el: door, content: content });
+      }
+      figure.appendChild(doorsRow);
+
+      var controls = el('div', { class: 'monty-controls' });
+      var switchBtn = el('button', { class: 'monty-btn monty-btn-primary', type: 'button', text: 'Skipta' });
+      var stayBtn   = el('button', { class: 'monty-btn',                  type: 'button', text: 'Halda' });
+      controls.appendChild(switchBtn);
+      controls.appendChild(stayBtn);
+      figure.appendChild(controls);
+
+      var replayBtn = el('button', { class: 'monty-btn monty-btn-primary monty-replay',
+                                      type: 'button', text: '↻ Leika aftur' });
+      figure.appendChild(replayBtn);
+
+      var scoreboard = el('div', { class: 'monty-scoreboard' });
+      function buildScoreRow(label) {
+        var row = el('div');
+        row.appendChild(el('span', { text: label }));
+        var val = el('span', { class: 'monty-stat', text: '—' });
+        row.appendChild(val);
+        scoreboard.appendChild(row);
+        return val;
+      }
+      var totalVal  = buildScoreRow('Leikir alls');
+      var switchVal = buildScoreRow('Skipti og vann');
+      var stayVal   = buildScoreRow('Hélt og vann');
+      figure.appendChild(scoreboard);
+
+      var note = el('p', { class: 'monty-note',
+        text: 'Þú vinnur oftar með því að skipta — líkurnar eru ⅔ með skiptingu en aðeins ⅓ með að halda.'
+      });
+      figure.appendChild(note);
+
+      var stats = { total: 0, switchWins: 0, switchGames: 0, stayWins: 0, stayGames: 0 };
+      var prize = 0, chosen = -1, opened = -1, phase = 'choose';
+
+      function setControlsVisibility() {
+        controls.style.display = (phase === 'switch') ? 'flex' : 'none';
+        replayBtn.style.display = (phase === 'reveal') ? 'inline-flex' : 'none';
+      }
+
+      function startNewRound() {
+        prize = Math.floor(Math.random() * 3);
+        chosen = -1;
+        opened = -1;
+        phase = 'choose';
+        promptEl.textContent = 'Veldu eina af þremur dyrum.';
+        for (var i = 0; i < 3; i++) {
+          doorEls[i].el.disabled = false;
+          doorEls[i].el.classList.remove('is-chosen', 'is-opened', 'is-final-win', 'is-final-loss', 'is-revealed');
+          doorEls[i].content.textContent = '?';
+        }
+        setControlsVisibility();
+      }
+
+      function onDoorClick(d) {
+        if (phase !== 'choose') return;
+        chosen = d;
+        var options = [0, 1, 2].filter(function (k) { return k !== chosen && k !== prize; });
+        opened = options[Math.floor(Math.random() * options.length)];
+
+        doorEls[chosen].el.classList.add('is-chosen');
+        doorEls[opened].el.classList.add('is-opened');
+        doorEls[opened].content.textContent = '🐐';
+        for (var i = 0; i < 3; i++) doorEls[i].el.disabled = true;
+
+        phase = 'switch';
+        promptEl.textContent = 'Viltu skipta um dyr?';
+        setControlsVisibility();
+      }
+
+      function decide(switching) {
+        var finalDoor = switching
+          ? [0, 1, 2].filter(function (k) { return k !== chosen && k !== opened; })[0]
+          : chosen;
+        var won = (finalDoor === prize);
+
+        for (var i = 0; i < 3; i++) {
+          doorEls[i].el.classList.add('is-revealed');
+          doorEls[i].content.textContent = (i === prize) ? '🏆' : '🐐';
+        }
+        doorEls[finalDoor].el.classList.add(won ? 'is-final-win' : 'is-final-loss');
+
+        stats.total++;
+        if (switching) {
+          stats.switchGames++;
+          if (won) stats.switchWins++;
+        } else {
+          stats.stayGames++;
+          if (won) stats.stayWins++;
+        }
+
+        var verb = switching ? 'skiptir' : 'heldur';
+        promptEl.textContent = (won ? 'Þú vannst! 🎉 ' : 'Því miður — vinningurinn var bak við aðrar dyr. ') +
+                                'Þú ' + verb + 'ð um dyr.';
+        phase = 'reveal';
+        setControlsVisibility();
+        updateScoreboard();
+      }
+
+      function updateScoreboard() {
+        totalVal.textContent = String(stats.total);
+        function ratio(wins, games) {
+          if (games === 0) return '—';
+          return wins + '/' + games + ' (' + Math.round(100 * wins / games) + '%)';
+        }
+        switchVal.textContent = ratio(stats.switchWins, stats.switchGames);
+        stayVal.textContent   = ratio(stats.stayWins,   stats.stayGames);
+        note.classList.toggle('is-visible', stats.total >= 5);
+      }
+
+      switchBtn.addEventListener('click', function () { decide(true);  });
+      stayBtn.addEventListener('click',   function () { decide(false); });
+      replayBtn.addEventListener('click', startNewRound);
+
+      startNewRound();
+    }
+
+    /* ---------- Sanngildistöflu Boole (kyrr tafla fyrir „og“ og „eða“) ---------- */
+    function renderBooleTable(figure) {
+      figure.className = 'booletable-figure';
+      figure.setAttribute('aria-label', 'Sanngildistafla sem sýnir margföldun („og“) og samlagningu („eða“) á 0 og 1');
+
+      figure.appendChild(el('figcaption', {
+        class: 'booletable-title',
+        text: 'Sanngildistafla'
+      }));
+
+      var table = el('table', { class: 'booletable' });
+      var thead = el('thead');
+      var headRow = el('tr');
+      ['A', 'B', 'A · B  („og“)', 'A + B  („eða“)'].forEach(function (h) {
+        headRow.appendChild(el('th', { scope: 'col', text: h }));
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      var tbody = el('tbody');
+      for (var a = 0; a < 2; a++) {
+        for (var b = 0; b < 2; b++) {
+          var tr = el('tr');
+          tr.appendChild(el('td', { text: String(a) }));
+          tr.appendChild(el('td', { text: String(b) }));
+          tr.appendChild(el('td', { class: 'booletable-result', text: String(a & b) }));
+          tr.appendChild(el('td', { class: 'booletable-result', text: String(a | b) }));
+          tbody.appendChild(tr);
+        }
+      }
+      table.appendChild(tbody);
+      figure.appendChild(table);
+
+      figure.appendChild(el('p', {
+        class: 'booletable-caption',
+        text: 'Taktu eftir: 1 + 1 = 1 í þessu kerfi, því 1 táknar „satt“ — ekki tölu.'
+      }));
+    }
+
+    /* ---------- Þrjú rökhlið hlið við hlið (AND / OR / XOR) ---------- */
+    function renderLogicGates(figure) {
+      figure.className = 'logicgates-figure';
+      figure.setAttribute('aria-label', 'Gagnvirkur samanburður á AND, OR og XOR rökhliðum');
+
+      figure.appendChild(el('figcaption', {
+        class: 'logicgates-title',
+        text: 'Prófaðu rökhliðin: kveiktu á A og B'
+      }));
+      figure.appendChild(el('p', {
+        class: 'logicgates-hint',
+        text: 'Smelltu á rofa A og B til að kveikja eða slökkva. Sjáðu hvernig hvert hlið svarar — og taktu eftir muninum á XOR og OR.'
+      }));
+
+      var state = { a: 0, b: 0 };
+
+      function makeToggle(name) {
+        var btn = el('button', { class: 'gate-toggle', type: 'button',
+                                  'aria-label': 'Kveiktu eða slökktu á inntaki ' + name,
+                                  'aria-pressed': 'false' });
+        btn.appendChild(el('span', { class: 'gate-toggle-name', text: name }));
+        var val = el('span', { class: 'gate-toggle-value', text: '0' });
+        btn.appendChild(val);
+        return { el: btn, val: val };
+      }
+
+      var aBtn = makeToggle('A');
+      var bBtn = makeToggle('B');
+      var inputsRow = el('div', { class: 'logicgates-inputs' });
+      inputsRow.appendChild(aBtn.el);
+      inputsRow.appendChild(bBtn.el);
+      figure.appendChild(inputsRow);
+
+      var GATES = [
+        { name: 'AND', symbol: 'A ∧ B', fn: function (a, b) { return a & b; } },
+        { name: 'OR',  symbol: 'A ∨ B', fn: function (a, b) { return a | b; } },
+        { name: 'XOR', symbol: 'A ⊕ B', fn: function (a, b) { return a ^ b; } }
+      ];
+
+      var grid = el('div', { class: 'logicgates-grid' });
+      var cells = GATES.map(function (g) {
+        var card = el('div', { class: 'logicgates-card' });
+        card.appendChild(el('div', { class: 'logicgates-card-title', text: g.name }));
+        card.appendChild(el('div', { class: 'logicgates-card-symbol', text: g.symbol }));
+
+        var bulb = el('div', { class: 'logicgates-bulb', 'aria-live': 'polite' });
+        var bulbVal = el('span', { class: 'logicgates-bulb-value', text: '0' });
+        bulb.appendChild(bulbVal);
+        card.appendChild(bulb);
+        card.appendChild(el('div', { class: 'logicgates-card-out', text: 'Útkoma' }));
+
+        // Sannleikatafla
+        var table = el('table', { class: 'logicgates-tt' });
+        var thead = el('thead');
+        var headRow = el('tr');
+        ['A', 'B', g.name].forEach(function (h) { headRow.appendChild(el('th', { text: h })); });
+        thead.appendChild(headRow);
+        table.appendChild(thead);
+
+        var tbody = el('tbody');
+        var rows = [];
+        for (var ai = 0; ai < 2; ai++) {
+          for (var bi = 0; bi < 2; bi++) {
+            var tr = el('tr', { 'data-a': String(ai), 'data-b': String(bi) });
+            tr.appendChild(el('td', { text: String(ai) }));
+            tr.appendChild(el('td', { text: String(bi) }));
+            tr.appendChild(el('td', { text: String(g.fn(ai, bi)) }));
+            tbody.appendChild(tr);
+            rows.push({ a: ai, b: bi, el: tr });
+          }
+        }
+        table.appendChild(tbody);
+        card.appendChild(table);
+        grid.appendChild(card);
+
+        return { def: g, card: card, bulb: bulb, bulbVal: bulbVal, rows: rows };
+      });
+      figure.appendChild(grid);
+
+      function update() {
+        aBtn.el.classList.toggle('is-on', state.a === 1);
+        bBtn.el.classList.toggle('is-on', state.b === 1);
+        aBtn.el.setAttribute('aria-pressed', state.a === 1 ? 'true' : 'false');
+        bBtn.el.setAttribute('aria-pressed', state.b === 1 ? 'true' : 'false');
+        aBtn.val.textContent = String(state.a);
+        bBtn.val.textContent = String(state.b);
+
+        cells.forEach(function (c) {
+          var out = c.def.fn(state.a, state.b);
+          c.bulbVal.textContent = String(out);
+          c.bulb.classList.toggle('is-on', out === 1);
+          c.rows.forEach(function (r) {
+            r.el.classList.toggle('is-active', r.a === state.a && r.b === state.b);
+          });
+        });
+      }
+
+      aBtn.el.addEventListener('click', function () { state.a = 1 - state.a; update(); });
+      bBtn.el.addEventListener('click', function () { state.b = 1 - state.b; update(); });
+
+      update();
+    }
+
+    /* ---------- AND-rafrás (gagnvirk) ---------- */
+    function renderAndCircuit(figure) {
+      figure.className = 'circuit-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk rafrás með tveimur rofum og peru sem virkar sem AND-hlið');
+
+      figure.appendChild(el('figcaption', {
+        class: 'circuit-title',
+        text: 'Rafrásin sem útskýrir AND'
+      }));
+      figure.appendChild(el('p', {
+        class: 'circuit-hint',
+        text: 'Smelltu á rofana A og B til að loka eða opna þeim. Peran kviknar aðeins ef BÆÐI eru lokuð — straumurinn þarf að komast alla leið í gegnum bæði rofa.'
+      }));
+
+      var svgWrap = el('div', { class: 'circuit-svg-wrap' });
+      svgWrap.innerHTML = [
+        '<svg viewBox="0 0 560 240" xmlns="http://www.w3.org/2000/svg" role="img"',
+        ' aria-label="Rafrás með tveimur raðtengdum rofum, rafhlöðu og peru">',
+
+          // Vírar (heild — fá is-live klasa þegar straumur flýgur í gegn)
+          '<g class="circuit-wires">',
+            '<path d="M 70 60 L 70 50 L 160 50" />',
+            '<path d="M 220 50 L 300 50" />',
+            '<path d="M 360 50 L 470 50 L 470 110" />',
+            '<path d="M 470 175 L 470 200 L 70 200 L 70 170" />',
+          '</g>',
+
+          // Rafhlaða (vertical, í miðri vinstri brún)
+          '<g class="circuit-battery">',
+            '<line x1="55" y1="80"  x2="85"  y2="80"  class="cell-long"  />',
+            '<line x1="62" y1="100" x2="78"  y2="100" class="cell-short" />',
+            '<line x1="55" y1="130" x2="85"  y2="130" class="cell-long"  />',
+            '<line x1="62" y1="150" x2="78"  y2="150" class="cell-short" />',
+            '<text x="95"  y="86" class="circuit-label">+</text>',
+            '<text x="95"  y="156" class="circuit-label">−</text>',
+          '</g>',
+
+          // Rofi A
+          '<g class="circuit-switch" data-switch="a">',
+            '<rect class="circuit-hit" x="145" y="0" width="90" height="65" />',
+            '<circle cx="160" cy="50" r="5" class="circuit-pad" />',
+            '<circle cx="220" cy="50" r="5" class="circuit-pad" />',
+            '<line class="circuit-lever" data-lever="a" x1="160" y1="50" x2="220" y2="50" />',
+            '<text x="190" y="22" class="circuit-switch-label">A</text>',
+            '<text x="190" y="84" class="circuit-switch-state" data-state="a">opinn</text>',
+          '</g>',
+
+          // Rofi B
+          '<g class="circuit-switch" data-switch="b">',
+            '<rect class="circuit-hit" x="285" y="0" width="90" height="65" />',
+            '<circle cx="300" cy="50" r="5" class="circuit-pad" />',
+            '<circle cx="360" cy="50" r="5" class="circuit-pad" />',
+            '<line class="circuit-lever" data-lever="b" x1="300" y1="50" x2="360" y2="50" />',
+            '<text x="330" y="22" class="circuit-switch-label">B</text>',
+            '<text x="330" y="84" class="circuit-switch-state" data-state="b">opinn</text>',
+          '</g>',
+
+          // Pera
+          '<g class="circuit-bulb">',
+            '<g class="circuit-bulb-rays">',
+              '<line x1="470" y1="80"  x2="470" y2="68"  />',
+              '<line x1="435" y1="100" x2="423" y2="88"  />',
+              '<line x1="505" y1="100" x2="517" y2="88"  />',
+              '<line x1="423" y1="143" x2="408" y2="143" />',
+              '<line x1="517" y1="143" x2="532" y2="143" />',
+            '</g>',
+            '<circle cx="470" cy="143" r="28" class="circuit-bulb-glass" />',
+            '<path d="M 458 154 L 463 138 L 470 154 L 477 138 L 482 154" class="circuit-bulb-fil" />',
+            '<rect x="460" y="167" width="20" height="9" class="circuit-bulb-base" />',
+          '</g>',
+        '</svg>'
+      ].join('');
+      figure.appendChild(svgWrap);
+
+      // Stöðuspjald
+      var status = el('div', { class: 'circuit-status' });
+      function makeChip(label) {
+        var chip = el('div', { class: 'circuit-chip' });
+        chip.appendChild(el('span', { class: 'circuit-chip-label', text: label }));
+        var val = el('span', { class: 'circuit-chip-value', text: '0' });
+        chip.appendChild(val);
+        return { el: chip, val: val };
+      }
+      var chipA   = makeChip('Rofi A');
+      var chipB   = makeChip('Rofi B');
+      var chipOut = makeChip('A · B');
+      status.appendChild(chipA.el);
+      status.appendChild(chipB.el);
+      status.appendChild(chipOut.el);
+      figure.appendChild(status);
+
+      var bulbLabel = el('p', { class: 'circuit-bulb-label', text: 'Pera: SLÖKKT' });
+      figure.appendChild(bulbLabel);
+
+      var state = { a: false, b: false };
+
+      function setSwitch(key, closed) {
+        var lever = figure.querySelector('[data-lever="' + key + '"]');
+        // Snúum lyftunni um vinstri snertipunkt (~30° upp þegar opin)
+        var pivot;
+        if (key === 'a') pivot = '160 50'; else pivot = '300 50';
+        lever.setAttribute('transform', closed ? '' : 'rotate(-30 ' + pivot + ')');
+        var label = figure.querySelector('[data-state="' + key + '"]');
+        label.textContent = closed ? 'lokaður' : 'opinn';
+      }
+
+      function update() {
+        setSwitch('a', state.a);
+        setSwitch('b', state.b);
+        var live = state.a && state.b;
+        figure.querySelector('.circuit-wires').classList.toggle('is-live', live);
+        figure.querySelector('.circuit-bulb').classList.toggle('is-on', live);
+        chipA.val.textContent  = state.a ? '1' : '0';
+        chipB.val.textContent  = state.b ? '1' : '0';
+        chipOut.val.textContent = live ? '1' : '0';
+        chipA.el.classList.toggle('is-on',  state.a);
+        chipB.el.classList.toggle('is-on',  state.b);
+        chipOut.el.classList.toggle('is-on', live);
+        bulbLabel.textContent = 'Pera: ' + (live ? 'KVEIKT' : 'SLÖKKT');
+        bulbLabel.classList.toggle('is-on', live);
+      }
+
+      figure.querySelectorAll('.circuit-switch').forEach(function (g) {
+        g.addEventListener('click', function () {
+          var key = g.getAttribute('data-switch');
+          state[key] = !state[key];
+          update();
+        });
+      });
+
+      update();
+    }
+
+    /* ---------- Hálf-deilari (tveggja-hliða samlagning, gagnvirk mynd) ---------- */
+    function renderHalfAdderVisual(figure) {
+      figure.className = 'hav-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk sýning á hálf-deilara: XOR og AND tengd saman til að leggja saman tvær einbita tölur');
+
+      figure.appendChild(el('figcaption', {
+        class: 'hav-title',
+        text: 'Tvö rökhlið leggja saman tvær tölur'
+      }));
+      figure.appendChild(el('p', {
+        class: 'hav-hint',
+        text: 'Smelltu á rofa A og B til að breyta inntakinu. XOR-hliðið gefur lægra bitann (summu) og AND gefur efra bitann (flutning).'
+      }));
+
+      var state = { a: 0, b: 0 };
+
+      // ===== Hringrásarmynd =====
+      var svgWrap = el('div', { class: 'hav-svg-wrap' });
+      figure.appendChild(svgWrap);
+
+      // ===== Sanngildistöflur fyrir bæði hlið =====
+      var tablesRow = el('div', { class: 'hav-tables' });
+
+      function buildTable(label, op) {
+        var wrap = el('div', { class: 'hav-table-wrap' });
+        wrap.appendChild(el('div', { class: 'hav-table-label', text: label }));
+        var table = el('table', { class: 'hav-table' });
+        var thead = el('thead');
+        var trh = el('tr');
+        ['A', 'B', label.split(' ')[0]].forEach(function (h) { trh.appendChild(el('th', { text: h })); });
+        thead.appendChild(trh);
+        table.appendChild(thead);
+        var tbody = el('tbody');
+        var rows = [];
+        for (var a = 0; a < 2; a++) {
+          for (var b = 0; b < 2; b++) {
+            var v = op(a, b);
+            var tr = el('tr');
+            tr.appendChild(el('td', { text: String(a) }));
+            tr.appendChild(el('td', { text: String(b) }));
+            tr.appendChild(el('td', { class: 'hav-out' + (v ? ' is-true' : ''), text: String(v) }));
+            tbody.appendChild(tr);
+            rows.push({ a: a, b: b, el: tr });
+          }
+        }
+        table.appendChild(tbody);
+        wrap.appendChild(table);
+        return { el: wrap, rows: rows };
+      }
+
+      var xorTable = buildTable('XOR (A ⊕ B)', function (a, b) { return a ^ b; });
+      var andTable = buildTable('AND (A · B)', function (a, b) { return a & b; });
+      tablesRow.appendChild(xorTable.el);
+      tablesRow.appendChild(andTable.el);
+      figure.appendChild(tablesRow);
+
+      // ===== Niðurstaða =====
+      var resultBox = el('div', { class: 'hav-result' });
+      figure.appendChild(resultBox);
+
+      function rebuild() {
+        var sum = state.a ^ state.b;
+        var carry = state.a & state.b;
+        var dec = state.a + state.b;
+
+        // Layout (560 × 320):
+        //   Vinstri: inntak A og B (rofar með label)
+        //   Greinipunktar: A_dot (160, 90),  B_dot (160, 230)
+        //   XOR-hlið efst hægra megin (~ 330, 95)
+        //   AND-hlið neðst hægra megin (~ 330, 225)
+        //   Frálagskassar:  SUMMA  (470, 70) og  FLUTNINGUR (470, 200)
+        svgWrap.innerHTML = [
+          '<svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" class="hav-svg">',
+
+            // Innrofar — A og B (kassi með „rofa“ og labelmerki vinstra megin)
+            '<g class="hav-input-group" data-input="a">',
+              '<text x="20" y="92" class="hav-input-side-label">Inntak A</text>',
+              '<rect class="hav-input-hit" x="90" y="60" width="64" height="60" />',
+              '<rect x="90" y="60" width="64" height="60" rx="6" class="hav-input-box ' + (state.a ? 'is-on' : '') + '" />',
+              // „rofi“ sjónlíking — lóðrétt strik í kassanum
+              '<rect x="112" y="70" width="20" height="40" rx="3" class="hav-input-switch ' + (state.a ? 'is-on' : '') + '" />',
+              '<line x1="122" y1="' + (state.a ? '74' : '108') + '" x2="122" y2="' + (state.a ? '94' : '94') + '" class="hav-input-stem ' + (state.a ? 'is-on' : '') + '" />',
+              '<text x="122" y="138" class="hav-input-value">' + state.a + '</text>',
+            '</g>',
+            '<g class="hav-input-group" data-input="b">',
+              '<text x="20" y="232" class="hav-input-side-label">Inntak B</text>',
+              '<rect class="hav-input-hit" x="90" y="200" width="64" height="60" />',
+              '<rect x="90" y="200" width="64" height="60" rx="6" class="hav-input-box ' + (state.b ? 'is-on' : '') + '" />',
+              '<rect x="112" y="210" width="20" height="40" rx="3" class="hav-input-switch ' + (state.b ? 'is-on' : '') + '" />',
+              '<line x1="122" y1="' + (state.b ? '214' : '248') + '" x2="122" y2="' + (state.b ? '234' : '234') + '" class="hav-input-stem ' + (state.b ? 'is-on' : '') + '" />',
+              '<text x="122" y="278" class="hav-input-value">' + state.b + '</text>',
+            '</g>',
+
+            // Greinipunktar á vírum eftir hvern rofa (litlir hringir)
+            '<circle cx="172" cy="90"  r="3.5" class="hav-junction ' + (state.a ? 'is-live' : '') + '" />',
+            '<circle cx="172" cy="230" r="3.5" class="hav-junction ' + (state.b ? 'is-live' : '') + '" />',
+
+            // Vírar: A → XOR efri inntak  (sveigð leið)
+            '<path class="hav-wire ' + (state.a ? 'is-live' : '') + '" d="M 154 90 L 172 90 C 230 90 260 80 295 90" />',
+            // Vírar: A → AND efri inntak  (krossar yfir í B-helminginn)
+            '<path class="hav-wire ' + (state.a ? 'is-live' : '') + '" d="M 172 90 C 200 130 240 200 295 220" />',
+            // Vírar: B → XOR neðri inntak (krossar upp í XOR)
+            '<path class="hav-wire ' + (state.b ? 'is-live' : '') + '" d="M 154 230 L 172 230 C 215 230 250 130 295 110" />',
+            // Vírar: B → AND neðri inntak
+            '<path class="hav-wire ' + (state.b ? 'is-live' : '') + '" d="M 172 230 C 230 230 260 235 295 235" />',
+
+            // Litlir inntak-hringir á hliðin
+            '<circle cx="295" cy="90"  r="3" class="hav-junction ' + (state.a ? 'is-live' : '') + '" />',
+            '<circle cx="295" cy="110" r="3" class="hav-junction ' + (state.b ? 'is-live' : '') + '" />',
+            '<circle cx="295" cy="220" r="3" class="hav-junction ' + (state.a ? 'is-live' : '') + '" />',
+            '<circle cx="295" cy="235" r="3" class="hav-junction ' + (state.b ? 'is-live' : '') + '" />',
+
+            // XOR hlið (efra) — staðsett 295..360 lárétt, 75..125 lóðrétt
+            '<g class="hav-gate ' + (sum ? 'is-active' : '') + '">',
+              '<path class="hav-gate-extra" d="M 291 75 Q 300 100 291 125" />',
+              '<path class="hav-gate-body"  d="M 295 75 Q 312 75 350 100 Q 312 125 295 125 Q 304 100 295 75 Z" />',
+              '<text x="320" y="105" class="hav-gate-name">XOR</text>',
+            '</g>',
+            // XOR útgangslína + tengihringur
+            '<circle cx="354" cy="100" r="3" class="hav-junction ' + (sum ? 'is-live' : '') + '" />',
+            '<path class="hav-wire ' + (sum ? 'is-live' : '') + '" d="M 354 100 L 400 100 L 400 75 L 460 75" />',
+            '<circle cx="460" cy="75" r="3" class="hav-junction ' + (sum ? 'is-live' : '') + '" />',
+
+            // AND hlið (neðra) — staðsett 295..350 lárétt, 210..245 lóðrétt
+            '<g class="hav-gate ' + (carry ? 'is-active' : '') + '">',
+              '<path class="hav-gate-body" d="M 295 210 L 320 210 A 17.5 17.5 0 0 1 320 245 L 295 245 Z" />',
+              '<text x="316" y="232" class="hav-gate-name">AND</text>',
+            '</g>',
+            // AND útgangslína + tengihringur
+            '<circle cx="341" cy="227" r="3" class="hav-junction ' + (carry ? 'is-live' : '') + '" />',
+            '<path class="hav-wire ' + (carry ? 'is-live' : '') + '" d="M 341 227 L 400 227 L 400 215 L 460 215" />',
+            '<circle cx="460" cy="215" r="3" class="hav-junction ' + (carry ? 'is-live' : '') + '" />',
+
+            // Frálagskassar: SUMMA (efri) og FLUTNINGUR (neðri)
+            '<g class="hav-out-group">',
+              '<rect x="460" y="40" width="80" height="80" rx="6" class="hav-out-box ' + (sum ? 'is-on' : '') + '" />',
+              '<text x="500" y="95" class="hav-out-value">' + sum + '</text>',
+              '<rect x="540" y="60" width="14" height="40" rx="2" class="hav-out-tag" />',
+              '<text x="547" y="86" class="hav-out-tag-text" transform="rotate(90 547 86)">sum</text>',
+            '</g>',
+            '<g class="hav-out-group">',
+              '<rect x="460" y="180" width="80" height="80" rx="6" class="hav-out-box ' + (carry ? 'is-on' : '') + '" />',
+              '<text x="500" y="235" class="hav-out-value">' + carry + '</text>',
+              '<rect x="540" y="200" width="14" height="50" rx="2" class="hav-out-tag" />',
+              '<text x="547" y="232" class="hav-out-tag-text" transform="rotate(90 547 232)">carry</text>',
+            '</g>',
+          '</svg>'
+        ].join('');
+
+        // Smella á inntak-kassa
+        svgWrap.querySelectorAll('.hav-input-group').forEach(function (g) {
+          g.addEventListener('click', function () {
+            var k = g.getAttribute('data-input');
+            state[k] = state[k] ^ 1;
+            rebuild();
+          });
+        });
+
+        // Lita virka röð í hverri töflu
+        xorTable.rows.forEach(function (r) {
+          r.el.classList.toggle('is-current', r.a === state.a && r.b === state.b);
+        });
+        andTable.rows.forEach(function (r) {
+          r.el.classList.toggle('is-current', r.a === state.a && r.b === state.b);
+        });
+
+        // Niðurstaða
+        resultBox.innerHTML = '';
+        resultBox.appendChild(el('span', { class: 'hav-result-eq',
+          text: state.a + ' + ' + state.b + ' = '
+        }));
+        var bin = el('span', { class: 'hav-result-bin' });
+        bin.appendChild(el('span', { class: 'hav-result-bit' + (carry ? ' is-on' : ''), text: String(carry) }));
+        bin.appendChild(el('span', { class: 'hav-result-bit' + (sum ? ' is-on' : ''),   text: String(sum)   }));
+        resultBox.appendChild(bin);
+        resultBox.appendChild(el('span', { class: 'hav-result-tail',
+          text: ' (tvíundakerfi) — ' + dec + ' í tugakerfi'
+        }));
+      }
+
+      rebuild();
+    }
+
+    /* ---------- Sanngildistöflu-skoðari (6 rökhlið) ---------- */
+    function renderTruthTable(figure) {
+      // Hvert hlið með SVG-tákni, formúlu og útkomu-falli.
+      var GATES = [
+        { key: 'and',  name: 'AND',  formula: 'A · B',     desc: 'Útkoma er 1 aðeins þegar BÆÐI eru 1.',
+          op: function (a, b) { return a & b; },
+          symbol: '<path d="M 14 8 L 30 8 A 17 17 0 0 1 30 42 L 14 42 Z" />' },
+        { key: 'or',   name: 'OR',   formula: 'A + B',     desc: 'Útkoma er 1 ef ANNAÐ HVORT (eða bæði) eru 1.',
+          op: function (a, b) { return a | b; },
+          symbol: '<path d="M 14 8 Q 28 8 47 25 Q 28 42 14 42 Q 22 25 14 8 Z" />' },
+        { key: 'nand', name: 'NAND', formula: '¬(A · B)',  desc: 'Andstaða AND. Útkoma er 1 nema bæði séu 1.',
+          op: function (a, b) { return (a & b) ^ 1; },
+          symbol: '<path d="M 14 8 L 30 8 A 17 17 0 0 1 30 42 L 14 42 Z" /><circle cx="52" cy="25" r="3.5" class="tt-symbol-bubble" />' },
+        { key: 'nor',  name: 'NOR',  formula: '¬(A + B)',  desc: 'Andstaða OR. Útkoma er 1 aðeins þegar bæði eru 0.',
+          op: function (a, b) { return (a | b) ^ 1; },
+          symbol: '<path d="M 14 8 Q 28 8 47 25 Q 28 42 14 42 Q 22 25 14 8 Z" /><circle cx="52" cy="25" r="3.5" class="tt-symbol-bubble" />' },
+        { key: 'xor',  name: 'XOR',  formula: 'A ⊕ B',     desc: 'Útkoma er 1 þegar nákvæmlega EITT inntak er 1.',
+          op: function (a, b) { return a ^ b; },
+          symbol: '<path d="M 10 8 Q 18 25 10 42" class="tt-symbol-extra" /><path d="M 14 8 Q 28 8 47 25 Q 28 42 14 42 Q 22 25 14 8 Z" />' },
+        { key: 'xnor', name: 'XNOR', formula: '¬(A ⊕ B)',  desc: 'Andstaða XOR. Útkoma er 1 þegar inntökin eru EINS.',
+          op: function (a, b) { return (a ^ b) ^ 1; },
+          symbol: '<path d="M 10 8 Q 18 25 10 42" class="tt-symbol-extra" /><path d="M 14 8 Q 28 8 47 25 Q 28 42 14 42 Q 22 25 14 8 Z" /><circle cx="52" cy="25" r="3.5" class="tt-symbol-bubble" />' }
+      ];
+
+      figure.className = 'tt-figure';
+      figure.setAttribute('aria-label', 'Sanngildistöflu-skoðari fyrir sex algeng rökhlið');
+
+      figure.appendChild(el('figcaption', {
+        class: 'tt-title',
+        text: 'Önnur rökhlið og sanngildistöflur'
+      }));
+      figure.appendChild(el('p', {
+        class: 'tt-hint',
+        text: 'Veldu rökhlið til að sjá tákn þess og sanngildistöflu. Smelltu á A og B til að sjá hvaða röð kveikir á frálaginu.'
+      }));
+
+      // Velja-pílur
+      var selector = el('div', { class: 'tt-selector' });
+      GATES.forEach(function (g) {
+        var btn = el('button', { class: 'tt-pill', type: 'button', 'data-gate': g.key, text: g.name });
+        btn.addEventListener('click', function () { select(g.key); });
+        selector.appendChild(btn);
+      });
+      figure.appendChild(selector);
+
+      // Kort: tákn + uppl.
+      var card = el('div', { class: 'tt-card' });
+      figure.appendChild(card);
+
+      var state = { a: 0, b: 0 };
+      var current = 'and';
+
+      function select(key) {
+        current = key;
+        state = { a: 0, b: 0 };
+        selector.querySelectorAll('.tt-pill').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-gate') === key);
+        });
+        render();
+      }
+
+      function render() {
+        var g = GATES.find(function (x) { return x.key === current; });
+        card.innerHTML = '';
+
+        // Vinstri: SVG-tákn
+        var left = el('div', { class: 'tt-symbol-wrap' });
+        var svg = el('div', { class: 'tt-symbol' });
+        svg.innerHTML = [
+          '<svg viewBox="0 0 65 50" xmlns="http://www.w3.org/2000/svg" class="tt-symbol-svg">',
+            // inntaks-strik
+            '<line x1="0" y1="15" x2="14" y2="15" class="tt-symbol-line" />',
+            '<line x1="0" y1="35" x2="14" y2="35" class="tt-symbol-line" />',
+            '<text x="4" y="11" class="tt-symbol-label">A</text>',
+            '<text x="4" y="48" class="tt-symbol-label">B</text>',
+            // hliðlíkami (path/cirles)
+            '<g class="tt-symbol-body">', g.symbol, '</g>',
+            // útgangslínu
+            '<line x1="55" y1="25" x2="65" y2="25" class="tt-symbol-line" />',
+            '<text x="60" y="20" class="tt-symbol-label">Q</text>',
+          '</svg>'
+        ].join('');
+        left.appendChild(svg);
+        var fname = el('div', { class: 'tt-name', text: g.name });
+        var fformula = el('div', { class: 'tt-formula', text: g.formula });
+        var fdesc = el('p', { class: 'tt-desc', text: g.desc });
+        left.appendChild(fname);
+        left.appendChild(fformula);
+        left.appendChild(fdesc);
+        card.appendChild(left);
+
+        // Hægri: inntaksrofar + sanngildistafla
+        var right = el('div', { class: 'tt-right' });
+
+        var toggles = el('div', { class: 'tt-toggles' });
+        ['a', 'b'].forEach(function (key) {
+          var row = el('div', { class: 'tt-toggle-row' });
+          row.appendChild(el('span', { class: 'tt-toggle-label', text: key.toUpperCase() }));
+          var btns = el('div', { class: 'tt-toggle-btns' });
+          [0, 1].forEach(function (v) {
+            var btn = el('button', {
+              class: 'tt-toggle-btn' + (state[key] === v ? ' is-on' : ''),
+              type: 'button', text: String(v)
+            });
+            btn.addEventListener('click', function () {
+              state[key] = v;
+              render();
+            });
+            btns.appendChild(btn);
+          });
+          row.appendChild(btns);
+          toggles.appendChild(row);
+        });
+        right.appendChild(toggles);
+
+        // Q-vísir
+        var qVal = g.op(state.a, state.b);
+        var qWrap = el('div', { class: 'tt-q-wrap' });
+        qWrap.appendChild(el('span', { class: 'tt-q-label', text: 'Q' }));
+        qWrap.appendChild(el('span', { class: 'tt-q-value' + (qVal ? ' is-on' : ''), text: String(qVal) }));
+        right.appendChild(qWrap);
+
+        // Sanngildistafla
+        var table = el('table', { class: 'tt-table' });
+        var thead = el('thead');
+        var trHead = el('tr');
+        ['A', 'B', 'Q'].forEach(function (h) {
+          trHead.appendChild(el('th', { scope: 'col', text: h }));
+        });
+        thead.appendChild(trHead);
+        table.appendChild(thead);
+
+        var tbody = el('tbody');
+        for (var a = 0; a < 2; a++) {
+          for (var b = 0; b < 2; b++) {
+            var out = g.op(a, b);
+            var tr = el('tr', {
+              class: (a === state.a && b === state.b ? 'is-current' : '') + (out ? ' is-true' : ' is-false')
+            });
+            tr.appendChild(el('td', { text: String(a) }));
+            tr.appendChild(el('td', { text: String(b) }));
+            tr.appendChild(el('td', { class: 'tt-out', text: String(out) }));
+            tbody.appendChild(tr);
+          }
+        }
+        table.appendChild(tbody);
+        right.appendChild(table);
+        card.appendChild(right);
+      }
+
+      select('and');
+    }
+
+    /* ---------- Gate-smíðari (blueprint-byggingar) ---------- */
+    function renderGateBuilder(figure) {
+      // Sameiginlegir grunnar — sömu vírar og rofastöður endurnýttar fyrir AND/NOR (raðtengt)
+      // og OR/NAND (samhliða). Sá eini munur er „rofategund": NO (venjul.) eða NC (andstæða).
+      var SERIES = {
+        wires: [
+          { id: 'w1', d: 'M 70 100 L 70 80 L 180 80' },
+          { id: 'w2', d: 'M 240 80 L 300 80' },
+          { id: 'w3', d: 'M 360 80 L 490 80 L 490 107' },
+          { id: 'w4', d: 'M 490 163 L 490 215 L 70 215 L 70 175' }
+        ],
+        switches: [
+          { key: 'a', pad1: [180, 80], pad2: [240, 80], lblY: 65, stateY: 105, hit: [170, 50, 80, 60] },
+          { key: 'b', pad1: [300, 80], pad2: [360, 80], lblY: 65, stateY: 105, hit: [290, 50, 80, 60] }
+        ]
+      };
+      var PARALLEL = {
+        wires: [
+          { id: 'w1', d: 'M 70 100 L 70 50 L 180 50' },
+          { id: 'w2', d: 'M 130 50 L 130 210 L 180 210' },
+          { id: 'w3', d: 'M 240 50 L 420 50',  branch: 'a' },
+          { id: 'w4', d: 'M 240 210 L 420 210', branch: 'b' },
+          { id: 'w5', d: 'M 420 50 L 420 210' },
+          { id: 'w6', d: 'M 420 50 L 490 50 L 490 107' },
+          { id: 'w7', d: 'M 490 163 L 490 230 L 70 230 L 70 175' }
+        ],
+        switches: [
+          { key: 'a', pad1: [180, 50],  pad2: [240, 50],  lblY: 35,  stateY: 75,  hit: [170, 20,  80, 60] },
+          { key: 'b', pad1: [180, 210], pad2: [240, 210], lblY: 195, stateY: 235, hit: [170, 180, 80, 60] }
+        ]
+      };
+
+      var GATES = {
+        and:  { name: 'AND',  formula: 'A · B',     wiring: 'series',   switchType: 'no',
+                intro: 'Raðtengt með venjulegum rofum: ljósið kviknar þegar BÆÐI eru lokuð.' },
+        or:   { name: 'OR',   formula: 'A + B',     wiring: 'parallel', switchType: 'no',
+                intro: 'Samhliða með venjulegum rofum: ljósið kviknar þegar ANNAR (eða báðir) eru lokaðir.' },
+        nand: { name: 'NAND', formula: '¬(A · B)',  wiring: 'parallel', switchType: 'nc',
+                intro: 'Samhliða með andstæðu-rofum: ljósið er ALLTAF kveikt nema BÁÐIR séu lokaðir.' },
+        nor:  { name: 'NOR',  formula: '¬(A + B)',  wiring: 'series',   switchType: 'nc',
+                intro: 'Raðtengt með andstæðu-rofum: ljósið kviknar AÐEINS þegar báðir rofar eru opnir.' }
+      };
+
+      // Hjálpartól: er rofi raunverulega lokaður (hleypir straumi)?
+      function closedOf(gate, key, state) {
+        // NC = andstæða: lokaður þegar inntak er 0 (rofi ekki togglaður).
+        return gate.switchType === 'nc' ? !state[key] : state[key];
+      }
+      // Lifir rafrásin? Series: bæði lokuð. Parallel: að minnsta kosti annar lokaður.
+      function gateLive(gate, state) {
+        var ca = closedOf(gate, 'a', state);
+        var cb = closedOf(gate, 'b', state);
+        return gate.wiring === 'series' ? (ca && cb) : (ca || cb);
+      }
+
+      figure.className = 'gbuilder-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk smíðatöflu rökhliða');
+
+      figure.appendChild(el('figcaption', {
+        class: 'gbuilder-title',
+        text: 'Smíðaðu þitt eigið rökhlið'
+      }));
+      figure.appendChild(el('p', {
+        class: 'gbuilder-hint',
+        text: 'Veldu rökhlið. Þá birtast strikaðar línur — smelltu á hverja til að tengja vír. Þegar rafrásin er fullbúin geturðu kveikt á rofunum og prófað hana.'
+      }));
+
+      var selector = el('div', { class: 'gbuilder-selector' });
+      ['and', 'or'].forEach(function (k) {
+        var g = GATES[k];
+        var btn = el('button', { class: 'gbuilder-pill', type: 'button', 'data-gate': k });
+        btn.appendChild(el('span', { class: 'gbuilder-pill-name',    text: g.name }));
+        btn.appendChild(el('span', { class: 'gbuilder-pill-formula', text: g.formula }));
+        btn.addEventListener('click', function () { selectGate(k); });
+        selector.appendChild(btn);
+      });
+      figure.appendChild(selector);
+
+      var introEl = el('p', { class: 'gbuilder-intro',
+                               text: 'Veldu AND eða OR til að sjá teikninguna.' });
+      figure.appendChild(introEl);
+
+      var svgWrap = el('div', { class: 'gbuilder-svg-wrap' });
+      figure.appendChild(svgWrap);
+
+      var progress = el('p', { class: 'gbuilder-progress', text: '' });
+      figure.appendChild(progress);
+
+      var status = el('div', { class: 'gbuilder-status' });
+      function makeChip(label) {
+        var chip = el('div', { class: 'gbuilder-chip' });
+        chip.appendChild(el('span', { class: 'gbuilder-chip-label', text: label }));
+        var val = el('span', { class: 'gbuilder-chip-value', text: '—' });
+        chip.appendChild(val);
+        return { el: chip, val: val };
+      }
+      var chipA   = makeChip('A');
+      var chipB   = makeChip('B');
+      var chipOut = makeChip('Frálag');
+      status.appendChild(chipA.el);
+      status.appendChild(chipB.el);
+      status.appendChild(chipOut.el);
+      figure.appendChild(status);
+
+      // ===== Staða =====
+      var current = null;
+      var built   = {};
+      var state   = { a: false, b: false };
+
+      function selectGate(key) {
+        current = key;
+        built = {};
+        state = { a: false, b: false };
+        selector.querySelectorAll('.gbuilder-pill').forEach(function (b) {
+          b.classList.toggle('is-active', b.getAttribute('data-gate') === key);
+        });
+        introEl.textContent = GATES[key].intro;
+        rebuild();
+      }
+
+      function isComplete() {
+        if (!current) return false;
+        return getWires().every(function (w) { return built[w.id]; });
+      }
+      function getWires() {
+        return (GATES[current].wiring === 'series' ? SERIES.wires : PARALLEL.wires);
+      }
+      function getSwitches() {
+        return (GATES[current].wiring === 'series' ? SERIES.switches : PARALLEL.switches);
+      }
+
+      function rebuild() {
+        if (!current) {
+          svgWrap.innerHTML = '';
+          progress.textContent = '';
+          chipA.val.textContent = chipB.val.textContent = chipOut.val.textContent = '—';
+          chipA.el.classList.remove('is-on');
+          chipB.el.classList.remove('is-on');
+          chipOut.el.classList.remove('is-on');
+          return;
+        }
+        var g = GATES[current];
+        var wires = getWires();
+        var switches = getSwitches();
+        var complete = isComplete();
+        var ca = closedOf(g, 'a', state);
+        var cb = closedOf(g, 'b', state);
+        var live = complete && gateLive(g, state);
+
+        var s = [];
+        s.push('<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" class="gbuilder-svg">');
+
+        // Vírar (hver vír er sér <g> með hit + sjónlegt path)
+        wires.forEach(function (w) {
+          var isBuilt = !!built[w.id];
+          var wireLive = false;
+          if (isBuilt) {
+            if (w.branch === 'a') wireLive = ca && complete;
+            else if (w.branch === 'b') wireLive = cb && complete;
+            else wireLive = live;
+          }
+          var classes = ['gbuilder-wire'];
+          classes.push(isBuilt ? 'is-built' : 'is-blueprint');
+          if (wireLive) classes.push('is-live');
+          s.push('<g class="gbuilder-wire-group ' + (isBuilt ? 'is-built' : '') + '" data-wire="' + w.id + '">');
+          s.push('<path d="' + w.d + '" class="gbuilder-wire-hit" />');
+          s.push('<path d="' + w.d + '" class="' + classes.join(' ') + '" />');
+          s.push('</g>');
+        });
+
+        // Rafhlaða
+        s.push('<g class="circuit-battery">');
+        s.push('<line x1="55" y1="100" x2="85" y2="100" class="cell-long"  />');
+        s.push('<line x1="62" y1="125" x2="78" y2="125" class="cell-short" />');
+        s.push('<line x1="55" y1="150" x2="85" y2="150" class="cell-long"  />');
+        s.push('<line x1="62" y1="175" x2="78" y2="175" class="cell-short" />');
+        s.push('<text x="95" y="106" class="circuit-label">+</text>');
+        s.push('<text x="95" y="181" class="circuit-label">−</text>');
+        s.push('</g>');
+
+        // Rofar
+        switches.forEach(function (sw) {
+          var closed = closedOf(g, sw.key, state);
+          var pivot = sw.pad1[0] + ' ' + sw.pad1[1];
+          var leverTr = closed ? '' : ('rotate(-30 ' + pivot + ')');
+          var leverClass = 'circuit-lever' + (g.switchType === 'nc' ? ' is-nc' : '');
+          s.push('<g class="gbuilder-switch' + (complete ? '' : ' is-disabled') + '" data-switch="' + sw.key + '">');
+          s.push('<rect class="circuit-hit" x="' + sw.hit[0] + '" y="' + sw.hit[1] + '" width="' + sw.hit[2] + '" height="' + sw.hit[3] + '" />');
+          s.push('<circle cx="' + sw.pad1[0] + '" cy="' + sw.pad1[1] + '" r="5" class="circuit-pad" />');
+          s.push('<circle cx="' + sw.pad2[0] + '" cy="' + sw.pad2[1] + '" r="5" class="circuit-pad" />');
+          s.push('<line class="' + leverClass + '" x1="' + sw.pad1[0] + '" y1="' + sw.pad1[1] + '" x2="' + sw.pad2[0] + '" y2="' + sw.pad2[1] + '" transform="' + leverTr + '" />');
+          var lblText = sw.key.toUpperCase();
+          if (g.switchType === 'nc') lblText += ' ¬';
+          s.push('<text x="' + ((sw.pad1[0] + sw.pad2[0]) / 2) + '" y="' + sw.lblY + '" class="circuit-switch-label">' + lblText + '</text>');
+          s.push('<text x="' + ((sw.pad1[0] + sw.pad2[0]) / 2) + '" y="' + sw.stateY + '" class="circuit-switch-state">' + (closed ? 'lokaður' : 'opinn') + '</text>');
+          s.push('</g>');
+        });
+
+        // ÍLAG / FRÁLAG röðunarmerki
+        var allX = [];
+        switches.forEach(function (sw) { allX.push(sw.pad1[0], sw.pad2[0]); });
+        var avgX = allX.reduce(function (a, b) { return a + b; }, 0) / allX.length;
+        s.push('<text x="' + avgX + '" y="14" class="circuit-section-label">ÍLAG</text>');
+        s.push('<text x="490" y="20" class="circuit-section-label">FRÁLAG</text>');
+
+        // Pera
+        s.push('<g class="circuit-bulb' + (live ? ' is-on' : '') + '">');
+        s.push('<g class="circuit-bulb-rays">');
+        s.push('<line x1="490" y1="80"  x2="490" y2="68"  />');
+        s.push('<line x1="455" y1="100" x2="443" y2="88"  />');
+        s.push('<line x1="525" y1="100" x2="537" y2="88"  />');
+        s.push('<line x1="445" y1="135" x2="430" y2="135" />');
+        s.push('<line x1="535" y1="135" x2="550" y2="135" />');
+        s.push('</g>');
+        s.push('<circle cx="490" cy="135" r="28" class="circuit-bulb-glass" />');
+        s.push('<path d="M 478 146 L 483 130 L 490 146 L 497 130 L 502 146" class="circuit-bulb-fil" />');
+        s.push('<rect x="480" y="159" width="20" height="9" class="circuit-bulb-base" />');
+        s.push('</g>');
+
+        s.push('</svg>');
+        svgWrap.innerHTML = s.join('');
+
+        // Click handlers
+        svgWrap.querySelectorAll('.gbuilder-wire-group').forEach(function (grp) {
+          if (grp.classList.contains('is-built')) return;
+          grp.addEventListener('click', function () {
+            built[grp.getAttribute('data-wire')] = true;
+            rebuild();
+          });
+        });
+        svgWrap.querySelectorAll('.gbuilder-switch').forEach(function (grp) {
+          if (grp.classList.contains('is-disabled')) return;
+          grp.addEventListener('click', function () {
+            var k = grp.getAttribute('data-switch');
+            state[k] = !state[k];
+            rebuild();
+          });
+        });
+
+        var totalWires = wires.length;
+        var builtCount = wires.filter(function (w) { return built[w.id]; }).length;
+        if (complete) {
+          progress.textContent = '✓ Rafrásin er tilbúin! Smelltu á rofa A og B til að prófa hana.';
+          progress.className = 'gbuilder-progress is-complete';
+        } else {
+          progress.textContent = builtCount + '/' + totalWires + ' vírar tengdir — smelltu á strikaðar línur til að teikna þá.';
+          progress.className = 'gbuilder-progress';
+        }
+
+        chipA.val.textContent = complete ? (state.a ? '1' : '0') : '—';
+        chipB.val.textContent = complete ? (state.b ? '1' : '0') : '—';
+        chipOut.val.textContent = complete ? (live ? '1' : '0') : '—';
+        chipA.el.classList.toggle('is-on',   complete && state.a);
+        chipB.el.classList.toggle('is-on',   complete && state.b);
+        chipOut.el.classList.toggle('is-on', live);
+      }
+
+      rebuild();
+    }
+
+    /* ---------- OR-rafrás (samhliða rofar) ---------- */
+    function renderOrCircuit(figure) {
+      figure.className = 'circuit-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk rafrás með tveimur samhliða rofum og peru sem virkar sem OR-hlið');
+
+      figure.appendChild(el('figcaption', {
+        class: 'circuit-title',
+        text: 'Rafrásin sem útskýrir OR'
+      }));
+      figure.appendChild(el('p', {
+        class: 'circuit-hint',
+        text: 'Hér eru rofarnir samhliða — straumurinn þarf BARA að komast aðra hvora leiðina. Peran kviknar ef A er lokuð EÐA B er lokuð (eða báðar).'
+      }));
+
+      var svgWrap = el('div', { class: 'circuit-svg-wrap' });
+      svgWrap.innerHTML = [
+        '<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" role="img"',
+        ' aria-label="Rafrás með tveimur samhliða rofum, rafhlöðu og peru">',
+
+          // Röðunarmerki: ÍLAG / FRÁLAG
+          '<text x="205" y="14" class="circuit-section-label">ÍLAG</text>',
+          '<text x="490" y="20" class="circuit-section-label">FRÁLAG</text>',
+
+          // Vírar í þremur hópum — main (alltaf lifandi þegar straumur flýgur),
+          // grein A (lifandi þegar A er lokuð), grein B (lifandi þegar B er lokuð).
+          '<g class="circuit-wires">',
+            // input + frá rafhlöðu upp og inn í vinstri tengipunkt
+            '<path d="M 70 100 L 70 50 L 140 50" />',
+            // vinstri lóðréttur teinn
+            '<path d="M 140 50 L 140 220" />',
+            // upper-branch-pre: vinstri kafli af efri grein (að A)
+            '<path d="M 140 50 L 175 50" />',
+            // upper-branch-post: hægri kafli (frá A í hægra junkt)
+            // (er ekki hér — er í circuit-wires-a)
+            // lower-branch-pre
+            '<path d="M 140 220 L 175 220" />',
+            // hægri lóðréttur teinn
+            '<path d="M 420 50 L 420 220" />',
+            // output frá hægri junkt → upp og hægri til peru
+            '<path d="M 420 50 L 490 50 L 490 110" />',
+            // return frá peru → niður, vinstri, upp til rafhlöðu −',
+            '<path d="M 490 160 L 490 240 L 70 240 L 70 150" />',
+          '</g>',
+          // Grein A — lit when A is closed
+          '<g class="circuit-wires-a">',
+            '<path d="M 235 50 L 420 50" />',
+          '</g>',
+          // Grein B — lit when B is closed
+          '<g class="circuit-wires-b">',
+            '<path d="M 235 220 L 420 220" />',
+          '</g>',
+
+          // Rafhlaða
+          '<g class="circuit-battery">',
+            '<line x1="55" y1="80"  x2="85"  y2="80"  class="cell-long"  />',
+            '<line x1="62" y1="100" x2="78"  y2="100" class="cell-short" />',
+            '<line x1="55" y1="130" x2="85"  y2="130" class="cell-long"  />',
+            '<line x1="62" y1="150" x2="78"  y2="150" class="cell-short" />',
+            '<text x="95"  y="86" class="circuit-label">+</text>',
+            '<text x="95"  y="156" class="circuit-label">−</text>',
+          '</g>',
+
+          // Rofi A (efri grein)
+          '<g class="circuit-switch" data-switch="a">',
+            '<rect class="circuit-hit" x="160" y="20" width="90" height="55" />',
+            '<circle cx="175" cy="50" r="5" class="circuit-pad" />',
+            '<circle cx="235" cy="50" r="5" class="circuit-pad" />',
+            '<line class="circuit-lever" data-lever="a" x1="175" y1="50" x2="235" y2="50" />',
+            '<text x="205" y="32" class="circuit-switch-label">A</text>',
+            '<text x="205" y="74" class="circuit-switch-state" data-state="a">opinn</text>',
+          '</g>',
+
+          // Rofi B (neðri grein)
+          '<g class="circuit-switch" data-switch="b">',
+            '<rect class="circuit-hit" x="160" y="190" width="90" height="55" />',
+            '<circle cx="175" cy="220" r="5" class="circuit-pad" />',
+            '<circle cx="235" cy="220" r="5" class="circuit-pad" />',
+            '<line class="circuit-lever" data-lever="b" x1="175" y1="220" x2="235" y2="220" />',
+            '<text x="205" y="208" class="circuit-switch-label">B</text>',
+            '<text x="205" y="244" class="circuit-switch-state" data-state="b">opinn</text>',
+          '</g>',
+
+          // Pera
+          '<g class="circuit-bulb">',
+            '<g class="circuit-bulb-rays">',
+              '<line x1="490" y1="80"  x2="490" y2="68"  />',
+              '<line x1="455" y1="100" x2="443" y2="88"  />',
+              '<line x1="525" y1="100" x2="537" y2="88"  />',
+              '<line x1="443" y1="135" x2="428" y2="135" />',
+              '<line x1="537" y1="135" x2="552" y2="135" />',
+            '</g>',
+            '<circle cx="490" cy="135" r="28" class="circuit-bulb-glass" />',
+            '<path d="M 478 146 L 483 130 L 490 146 L 497 130 L 502 146" class="circuit-bulb-fil" />',
+            '<rect x="480" y="159" width="20" height="9" class="circuit-bulb-base" />',
+          '</g>',
+        '</svg>'
+      ].join('');
+      figure.appendChild(svgWrap);
+
+      // Stöðuspjald
+      var status = el('div', { class: 'circuit-status' });
+      function makeChip(label) {
+        var chip = el('div', { class: 'circuit-chip' });
+        chip.appendChild(el('span', { class: 'circuit-chip-label', text: label }));
+        var val = el('span', { class: 'circuit-chip-value', text: '0' });
+        chip.appendChild(val);
+        return { el: chip, val: val };
+      }
+      var chipA   = makeChip('Rofi A');
+      var chipB   = makeChip('Rofi B');
+      var chipOut = makeChip('A + B');
+      status.appendChild(chipA.el);
+      status.appendChild(chipB.el);
+      status.appendChild(chipOut.el);
+      figure.appendChild(status);
+
+      var bulbLabel = el('p', { class: 'circuit-bulb-label', text: 'Pera: SLÖKKT' });
+      figure.appendChild(bulbLabel);
+
+      var state = { a: false, b: false };
+
+      function setSwitch(key, closed) {
+        var lever = figure.querySelector('[data-lever="' + key + '"]');
+        var pivot;
+        if (key === 'a') pivot = '175 50'; else pivot = '175 220';
+        lever.setAttribute('transform', closed ? '' : 'rotate(-30 ' + pivot + ')');
+        var label = figure.querySelector('[data-state="' + key + '"]');
+        label.textContent = closed ? 'lokaður' : 'opinn';
+      }
+
+      function update() {
+        setSwitch('a', state.a);
+        setSwitch('b', state.b);
+        var live = state.a || state.b;
+        figure.querySelector('.circuit-wires').classList.toggle('is-live', live);
+        figure.querySelector('.circuit-wires-a').classList.toggle('is-live', state.a);
+        figure.querySelector('.circuit-wires-b').classList.toggle('is-live', state.b);
+        figure.querySelector('.circuit-bulb').classList.toggle('is-on', live);
+        chipA.val.textContent  = state.a ? '1' : '0';
+        chipB.val.textContent  = state.b ? '1' : '0';
+        chipOut.val.textContent = live ? '1' : '0';
+        chipA.el.classList.toggle('is-on',  state.a);
+        chipB.el.classList.toggle('is-on',  state.b);
+        chipOut.el.classList.toggle('is-on', live);
+        bulbLabel.textContent = 'Pera: ' + (live ? 'KVEIKT' : 'SLÖKKT');
+        bulbLabel.classList.toggle('is-on', live);
+      }
+
+      figure.querySelectorAll('.circuit-switch').forEach(function (g) {
+        g.addEventListener('click', function () {
+          var key = g.getAttribute('data-switch');
+          state[key] = !state[key];
+          update();
+        });
+      });
+
+      update();
+    }
+    function renderHalfAdder(figure) {
+      figure.className = 'halfadder-figure';
+      figure.setAttribute('aria-label', 'Gagnvirk sýning á hálf-deilara: hvernig tölvur leggja saman tvær bitar');
+
+      figure.appendChild(el('figcaption', {
+        class: 'halfadder-title',
+        text: 'Svona leggur tölvan saman tölur'
+      }));
+      figure.appendChild(el('p', {
+        class: 'halfadder-hint',
+        text: 'Tvö hlið duga til að leggja saman tvær bitar — XOR gefur summuna, AND segir hvort þarf að flytja yfir. Saman mynda þau hálf-deilara (e. half adder), grunneiningu allra tölva.'
+      }));
+
+      var state = { a: 0, b: 0 };
+
+      function makeToggle(name) {
+        var btn = el('button', { class: 'gate-toggle', type: 'button',
+                                  'aria-label': 'Kveiktu eða slökktu á inntaki ' + name,
+                                  'aria-pressed': 'false' });
+        btn.appendChild(el('span', { class: 'gate-toggle-name', text: name }));
+        var val = el('span', { class: 'gate-toggle-value', text: '0' });
+        btn.appendChild(val);
+        return { el: btn, val: val };
+      }
+
+      var aBtn = makeToggle('A');
+      var bBtn = makeToggle('B');
+      var inputsRow = el('div', { class: 'halfadder-inputs' });
+      inputsRow.appendChild(aBtn.el);
+      inputsRow.appendChild(bBtn.el);
+      figure.appendChild(inputsRow);
+
+      var circuit = el('div', { class: 'halfadder-circuit' });
+
+      function buildGate(label, outputLabel) {
+        var row = el('div', { class: 'halfadder-gate' });
+        row.appendChild(el('div', { class: 'halfadder-gate-label', text: label }));
+        row.appendChild(el('div', { class: 'halfadder-arrow', 'aria-hidden': 'true', text: '→' }));
+        var out = el('div', { class: 'halfadder-output' });
+        out.appendChild(el('span', { class: 'halfadder-output-label', text: outputLabel }));
+        var valEl = el('span', { class: 'halfadder-output-value', text: '0' });
+        out.appendChild(valEl);
+        row.appendChild(out);
+        return { row: row, val: valEl };
+      }
+
+      var xorGate = buildGate('XOR (A ⊕ B)', 'Summa');
+      var andGate = buildGate('AND (A ∧ B)', 'Flutningur');
+      circuit.appendChild(xorGate.row);
+      circuit.appendChild(andGate.row);
+      figure.appendChild(circuit);
+
+      var result = el('p', { class: 'halfadder-result', role: 'status', 'aria-live': 'polite' });
+      figure.appendChild(result);
+
+      function update() {
+        aBtn.el.classList.toggle('is-on', state.a === 1);
+        bBtn.el.classList.toggle('is-on', state.b === 1);
+        aBtn.el.setAttribute('aria-pressed', state.a === 1 ? 'true' : 'false');
+        bBtn.el.setAttribute('aria-pressed', state.b === 1 ? 'true' : 'false');
+        aBtn.val.textContent = String(state.a);
+        bBtn.val.textContent = String(state.b);
+
+        var sum = state.a ^ state.b;
+        var carry = state.a & state.b;
+        xorGate.val.textContent = String(sum);
+        andGate.val.textContent = String(carry);
+        xorGate.row.classList.toggle('is-on', sum === 1);
+        andGate.row.classList.toggle('is-on', carry === 1);
+
+        var dec = state.a + state.b;
+        var bin = String(carry) + String(sum);
+        // Notum innerHTML til þess að geta haft <strong> innan textans
+        result.innerHTML = state.a + ' + ' + state.b + ' = <strong>' + bin +
+                            '</strong> í tvíundakerfi (= <strong>' + dec + '</strong> í tugakerfi)';
+      }
+
+      aBtn.el.addEventListener('click', function () { state.a = 1 - state.a; update(); });
+      bBtn.el.addEventListener('click', function () { state.b = 1 - state.b; update(); });
+
+      update();
+    }
+
+    /* ---------- Hliðarstika (efnisyfirlit) ---------- */
+    function renderToc(currentId) {
+      var toc = document.getElementById('toc');
+      toc.innerHTML = '';
+
+      bookData.parts.forEach(function (part) {
+        var partItem = el('li', { class: 'toc-part' });
+
+        partItem.appendChild(el('h3', { class: 'toc-part-title' }, [
+          el('span', { class: 'toc-part-num', text: 'Hluti ' + part.number }),
+          el('span', { text: part.title })
+        ]));
+
+        var chaptersInPart = bookData.chapters.filter(function (c) {
+          return c.part === part.number;
+        });
+
+        var list = el('ol', { class: 'toc-chapters' });
+
+        if (chaptersInPart.length === 0) {
+          list.appendChild(el('li', {}, [
+            el('span', { class: 'toc-empty', text: 'Kemur síðar' })
+          ]));
+        } else {
+          chaptersInPart.forEach(function (ch) {
+            var link = el('a', {
+              class: 'toc-link' + (ch.id === currentId ? ' is-current' : ''),
+              href: '#' + ch.id
+            });
+            link.appendChild(el('span', { class: 'toc-link-num', text: chapterNumber(ch) }));
+            link.appendChild(document.createTextNode(ch.title));
+            if (ch.id === currentId) {
+              link.setAttribute('aria-current', 'page');
+            }
+            list.appendChild(el('li', {}, [link]));
+          });
+        }
+
+        partItem.appendChild(list);
+        toc.appendChild(partItem);
+      });
+    }
+
+    /* ---------- Kafli ---------- */
+    function renderChapter(chapter) {
+      var root = document.getElementById('chapter');
+      root.innerHTML = '';
+
+      if (!chapter) {
+        root.appendChild(el('div', { class: 'empty-state' }, [
+          el('h2', { text: 'Kaflinn fannst ekki' }),
+          el('p',  { text: 'Veldu kafla úr listanum til vinstri.' })
+        ]));
+  
+        return;
+      }
+
+      var part = bookData.parts.find(function (p) { return p.number === chapter.part; });
+
+      root.appendChild(el('p', {
+        class: 'chapter-eyebrow',
+        text: 'Hluti ' + chapter.part + (part ? ' · ' + part.title : '')
+      }));
+
+      var title = el('h1', { class: 'chapter-title' });
+      title.appendChild(el('span', { class: 'chapter-title-num', text: chapterNumber(chapter) + '. ' }));
+      title.appendChild(document.createTextNode(chapter.title));
+      root.appendChild(title);
+
+      var body = el('div', { class: 'chapter-body' });
+
+      // Studjum bæði legacy `visual` (eitt mynda) og nýtt `visuals` fylki þar sem
+      // hver mynd hefur `after` reit sem segir á eftir hvaða málsgrein hún birtist.
+      var allVisuals = (chapter.visuals || []).concat(chapter.visual ? [chapter.visual] : []);
+      var byAfter = {};
+      var endVisuals = [];
+      allVisuals.forEach(function (v) {
+        if (typeof v.after === 'number') {
+          (byAfter[v.after] = byAfter[v.after] || []).push(v);
+        } else {
+          endVisuals.push(v);
+        }
+      });
+
+      (chapter.text || []).forEach(function (paragraph, idx) {
+        body.appendChild(el('p', { text: paragraph }));
+        if (byAfter[idx]) {
+          byAfter[idx].forEach(function (v) {
+            body.appendChild(renderVisual(v));
+          });
+        }
+      });
+      endVisuals.forEach(function (v) {
+        body.appendChild(renderVisual(v));
+      });
+      root.appendChild(body);
+
+      if (chapter.concepts && chapter.concepts.length) {
+        var section = el('section', { class: 'concepts', 'aria-labelledby': 'concepts-heading' });
+        section.appendChild(el('h2', { id: 'concepts-heading', class: 'concepts-heading', text: 'Hugtök' }));
+
+        var list = el('div', { class: 'concept-list' });
+        chapter.concepts.forEach(function (c) {
+          list.appendChild(el('div', { class: 'concept' }, [
+            el('h3', { class: 'concept-term',        text: c.term }),
+            el('p',  { class: 'concept-explanation', text: c.explanation })
+          ]));
+        });
+        section.appendChild(list);
+        root.appendChild(section);
+      }
+
+      // Næsti / fyrri kafli
+      var allChapters = bookData.chapters;
+      var idx = allChapters.indexOf(chapter);
+      var prev = idx > 0 ? allChapters[idx - 1] : null;
+      var next = idx < allChapters.length - 1 ? allChapters[idx + 1] : null;
+
+      if (prev || next) {
+        var nav = el('nav', { class: 'chapter-nav', 'aria-label': 'Næsti eða fyrri kafli' });
+
+        if (prev) {
+          var prevLink = el('a', { class: 'chapter-nav-link chapter-nav-prev', href: '#' + prev.id });
+          prevLink.appendChild(el('span', { class: 'chapter-nav-dir', text: '← Fyrri kafli' }));
+          prevLink.appendChild(el('span', { class: 'chapter-nav-title',
+                                             text: chapterNumber(prev) + ' ' + prev.title }));
+          nav.appendChild(prevLink);
+        } else {
+          nav.appendChild(el('span'));   // spacer svo „næsti“ haldist hægra megin
+        }
+
+        if (next) {
+          var nextLink = el('a', { class: 'chapter-nav-link chapter-nav-next', href: '#' + next.id });
+          nextLink.appendChild(el('span', { class: 'chapter-nav-dir', text: 'Næsti kafli →' }));
+          nextLink.appendChild(el('span', { class: 'chapter-nav-title',
+                                             text: chapterNumber(next) + ' ' + next.title }));
+          nav.appendChild(nextLink);
+        }
+
+        root.appendChild(nav);
+      }
+
+      document.title = chapterNumber(chapter) + ' ' + chapter.title + ' — ' + bookData.title;
+
+      // Skrunaðu efst þegar nýr kafli er valinn
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    /* ---------- Leiðsögn (hash-routing) ---------- */
+    function chapterFromHash() {
+      var raw = (location.hash || '').replace(/^#/, '');
+      var id;
+      try { id = decodeURIComponent(raw); }
+      catch (e) { id = raw; }
+      return bookData.chapters.find(function (c) { return c.id === id; }) || null;
+    }
+
+    function showCurrent() {
+      var chapter = chapterFromHash() || bookData.chapters[0] || null;
+      renderToc(chapter ? chapter.id : null);
+      renderChapter(chapter);
+    }
+
+    /* ---------- Hliðarstika á símum ---------- */
+    var sidebar  = document.getElementById('sidebar');
+    var scrim    = document.getElementById('sidebar-scrim');
+    var toggle   = document.querySelector('.menu-toggle');
+
+    function setSidebar(open) {
+      sidebar.classList.toggle('is-open', open);
+      scrim.classList.toggle('is-visible', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    toggle.addEventListener('click', function () {
+      setSidebar(!sidebar.classList.contains('is-open'));
+    });
+    scrim.addEventListener('click', function () { setSidebar(false); });
+
+    // Loka stikunni þegar kafli er valinn (á símum)
+    sidebar.addEventListener('click', function (e) {
+      var link = e.target.closest('a.toc-link');
+      if (link && window.matchMedia('(max-width: 860px)').matches) {
+        setSidebar(false);
+      }
+    });
+
+    // Esc lokar stikunni
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+        setSidebar(false);
+        toggle.focus();
+      }
+    });
+
+    /* ---------- Lesstillingar (leturstærð + næturhamur) ---------- */
+    var FONT_SIZES = [18, 20, 22];
+    var fontSizeIndex = 1;           // sjálfgefið: 20px
+    var darkOn = false;
+
+    function applyReadingSettings() {
+      // Öll stærð er rem-bundin, svo að stilla <html> skálar allan textann
+      document.documentElement.style.fontSize = FONT_SIZES[fontSizeIndex] + 'px';
+      document.body.classList.toggle('is-dark', darkOn);
+
+      var down = document.getElementById('rt-font-down');
+      var up   = document.getElementById('rt-font-up');
+      var sep  = document.getElementById('rt-sepia');
+      down.disabled = (fontSizeIndex === 0);
+      up.disabled   = (fontSizeIndex === FONT_SIZES.length - 1);
+      sep.setAttribute('aria-pressed', darkOn ? 'true' : 'false');
+    }
+
+    document.getElementById('rt-font-down').addEventListener('click', function () {
+      if (fontSizeIndex > 0) { fontSizeIndex--; applyReadingSettings(); }
+    });
+    document.getElementById('rt-font-up').addEventListener('click', function () {
+      if (fontSizeIndex < FONT_SIZES.length - 1) { fontSizeIndex++; applyReadingSettings(); }
+    });
+    document.getElementById('rt-sepia').addEventListener('click', function () {
+      darkOn = !darkOn;
+      applyReadingSettings();
+    });
+
+    applyReadingSettings();
+
+    /* ---------- Ræsing ---------- */
+    window.addEventListener('hashchange', showCurrent);
+    showCurrent();
+  })();
+  </script>
+
+</body>
+</html>
